@@ -1,0 +1,18 @@
+.star {
+    font-size: 20px;
+    color: #ccc;
+  }
+  
+  .star.filled {
+    color: #ffd700;
+  }
+  
+  .card-body {
+    padding: 15px;
+  }
+  
+  .stars {
+    font-size: 20px;
+    color: #ffd700;
+  }
+  
