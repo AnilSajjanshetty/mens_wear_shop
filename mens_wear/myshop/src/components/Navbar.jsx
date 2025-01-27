@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
-
+  // const [showLoginModal, setShowLoginModal] = useState(false);
+  // const [showRegisterModal, setShowRegisterModal] = useState(false);
   // const openLoginModal = () => setShowLoginModal(true);
-  const closeLoginModal = () => setShowLoginModal(false);
+  // const closeLoginModal = () => setShowLoginModal(false);
+  // const openRegisterModal = () => setShowRegisterModal(true);
+  // const closeRegisterModal = () => setShowRegisterModal(false);
 
-  const openRegisterModal = () => setShowRegisterModal(true);
-  const closeRegisterModal = () => setShowRegisterModal(false);
+  const navigate =useNavigate()
+  const openRegisterModal = () => navigate("/register");
   const onLoginHandle = () => {
-    window.location = config.server + "/authorize";
+    // window.location = config.server + "/authorize";
+navigate("/login")
   };
   return (
     <>
@@ -83,7 +86,7 @@ const Navbar = () => {
       </nav>
 
       {/* Modals */}
-      {showLoginModal && (
+      {/* {showLoginModal && (
         <LoginModal
           closeModal={closeLoginModal}
           openRegisterModal={openRegisterModal}
@@ -94,7 +97,7 @@ const Navbar = () => {
           closeModal={closeRegisterModal}
           openLoginModal={openLoginModal}
         />
-      )}
+      )} */}
     </>
   );
 };
