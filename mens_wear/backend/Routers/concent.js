@@ -4,7 +4,7 @@ const userRoles = require("../Modal/Users-Role-Modal");
 const roles = require("../Modal/Roles-Modal");
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+const concent = async (req, res) => {
   const challenge = req.query.consent_challenge;
 
   if (!challenge) {
@@ -49,6 +49,6 @@ router.get("/", async (req, res) => {
       .status(500)
       .send("An error occurred while processing consent. Please try again.");
   }
-});
+};
 
-module.exports = router;
+module.exports = { concent };

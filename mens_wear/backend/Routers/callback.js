@@ -7,7 +7,7 @@ const router = express.Router();
 const { HYDRA_PUBLIC_URL, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } =
   process.env;
 
-router.get("/", async (req, res) => {
+const callBack = async (req, res) => {
   const { code, login_challenge } = req.query;
   console.log({ login_challenge });
   if (!code) {
@@ -85,6 +85,6 @@ router.get("/", async (req, res) => {
       .status(500)
       .send("Error exchanging code for tokens or verifying login challenge");
   }
-});
+};
 
-module.exports = router;
+module.exports = { callBack };

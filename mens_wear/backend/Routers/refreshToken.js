@@ -5,7 +5,7 @@ const roles = require("../Modal/Roles-Modal"); // Assuming this is your model fo
 const router = express.Router();
 const { CLIENT_ID, CLIENT_SECRET, HYDRA_PUBLIC_URL } = process.env;
 
-router.post("/", async (req, res) => {
+const refreshToken = async (req, res) => {
   const { refresh_token, userId } = req.body;
 
   if (!refresh_token) {
@@ -61,6 +61,6 @@ router.post("/", async (req, res) => {
     console.error(error.response?.data || error.message);
     res.status(500).send("Error refreshing tokens");
   }
-});
+};
 
-module.exports = router;
+module.exports = { refreshToken };

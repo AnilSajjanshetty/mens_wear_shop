@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const { login } = require("../Controller/Login-Controller");
+const { oAuth } = require("../Routers/oauth");
+const { callBack } = require("../Routers/callback");
+const { concent } = require("../Routers/concent");
+const { refreshToken } = require("../Routers/refreshToken");
 const {
   home,
   registerCustomer,
@@ -88,5 +92,10 @@ router.route("/get-category/:categoryId").get(getSingleCategory);
 router.route("/edit-category/:categoryId").put(editCategory);
 router.route("/delete-category/:categoryId").delete(deleteCategory);
 
-router.route("/login").post(login); //login route
+router.route("/login").post(login);
+router.route("/authorize").get(oAuth);
+router.route("/consent").get(concent);
+router.route("/callback").get(callBack);
+router.route("/refreshToken").post(refreshToken);
+
 module.exports = router;
