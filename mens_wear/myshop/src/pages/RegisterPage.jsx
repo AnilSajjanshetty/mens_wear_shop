@@ -12,7 +12,7 @@ const RegisterPage = ({ closeModal, openLoginModal }) => {
 
   const handleRegister = async (data) => {
     try {
-      const response = await axios.post('http://192.168.43.231:3000/api/v1/register-customer',  {
+      const response = await axios.post('http://192.168.68.231:8000/api/v1/register-customer',  {
         userName: data.name,
         Email: data.email,
         Password: data.password,

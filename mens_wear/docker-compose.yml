@@ -1,52 +1,62 @@
 version: "3.8"
 
 services:
-  hydra-migrate:
-    image: oryd/hydra:v2.0.0
-    container_name: hydra-migrate
-    network_mode: hydraguide
-    environment:
-      DSN: postgres://hydra:secret@postgres:5432/hydra?sslmode=disable
-      URLS_SELF_ISSUER: https://${HOST_IP}:4444/
-      URLS_CONSENT: https://${HOST_IP}:5000/consent
-      URLS_LOGIN: https://${HOST_IP}:5000/login
-      TTL_ACCESS_TOKEN: 2h
-      TTL_REFRESH_TOKEN: 12h
-    entrypoint: >
-      /bin/sh -c "hydra migrate sql --yes"
-
-  hydra:
-    image: oryd/hydra:v2.0.0
-    container_name: hydra
-    network_mode: hydraguide
-    environment:
-      DSN: postgres://hydra:secret@postgres:5432/hydra?sslmode=disable
-      URLS_SELF_ISSUER: https://${HOST_IP}:4444/
-      URLS_CONSENT: https://${HOST_IP}:5000/consent
-      URLS_LOGIN: https://${HOST_IP}:5000/login
-      TTL_ACCESS_TOKEN: 2h
-      TTL_REFRESH_TOKEN: 12h
-      SECRETS_SYSTEM: ${SECRETS_SYSTEM} # use env variable from .env
-      LOG_LEVEL: debug
-    command: serve all --dev # Use --dev for development or remove this flag for production
-    ports:
-      - "4444:4444"
-      - "4445:4445"
-    depends_on:
-      - postgres
-
   postgres:
     image: postgres:13
     container_name: postgres
-    network_mode: hydraguide
+    networks:
+      - hydraguide
     environment:
       POSTGRES_USER: hydra
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: hydra
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hydra"]
+      interval: 5s
+      retries: 5
+
+  hydra-migrate:
+    image: oryd/hydra:v2.0.0
+    container_name: hydra-migrate
+    networks:
+      - hydraguide
+    environment:
+      DSN: postgres://hydra:secret@postgres:5432/hydra?sslmode=disable
+      URLS_SELF_ISSUER: http://${HOST_IP}:4444/
+      URLS_CONSENT: http://${HOST_IP}:8000/consent
+      URLS_LOGIN: http://${HOST_IP}:8000/login
+      TTL_ACCESS_TOKEN: 2h
+      TTL_REFRESH_TOKEN: 12h
+    entrypoint: >
+      /bin/sh -c "hydra migrate sql --yes"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  hydra:
+    image: oryd/hydra:v2.0.0
+    container_name: hydra
+    networks:
+      - hydraguide
+    environment:
+      DSN: postgres://hydra:secret@postgres:5432/hydra?sslmode=disable
+      URLS_SELF_ISSUER: http://${HOST_IP}:4444/
+      URLS_CONSENT: http://${HOST_IP}:8000/consent
+      URLS_LOGIN: http://${HOST_IP}:8000/login
+      TTL_ACCESS_TOKEN: 2h
+      TTL_REFRESH_TOKEN: 12h
+      SECRETS_SYSTEM: ${SECRETS_SYSTEM}
+      LOG_LEVEL: debug
+    command: serve all --dev
+    ports:
+      - "4444:4444"
+      - "4445:4445"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 networks:
   hydraguide:
     external: true
-volumes:
-  postgres_data:
