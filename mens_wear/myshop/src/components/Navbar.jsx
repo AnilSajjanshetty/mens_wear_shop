@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
 import { useNavigate } from 'react-router-dom';
-
+import config from "../../config"
 const Navbar = () => {
   // const [showLoginModal, setShowLoginModal] = useState(false);
   // const [showRegisterModal, setShowRegisterModal] = useState(false);
@@ -15,7 +15,8 @@ const Navbar = () => {
   const openRegisterModal = () => navigate("/register");
   const onLoginHandle = () => {
     // window.location = config.server + "/authorize";
-navigate("/login")
+// navigate("/login")
+window.location = config.server + "/authorize";
   };
   return (
     <>

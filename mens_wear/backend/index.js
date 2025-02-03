@@ -64,7 +64,7 @@ app.use("/api/v1", AllRouters);
 // app.use("/consent", consentRoutes);
 // app.use("/callback", callbackRoutes); // Register the callback route
 // app.use("refresh-token", refreshTokenRoutes);
-app.listen(PORT, HOST, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Shraddha-Jeans Server Started on ${HOST} port no. ${PORT}`);
 });
 

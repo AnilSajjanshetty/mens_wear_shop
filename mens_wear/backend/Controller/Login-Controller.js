@@ -5,7 +5,7 @@ const userRoles = require("../Modal/Users-Role-Modal");
 const axios = require("axios");
 const express = require("express");
 const router = express.Router();
-const { config } = require("../Config/config");
+const config = require("../Config/config");
 
 console.log({ config });
 const HYDRA_ADMIN_URL = config.HYDRA_URL;

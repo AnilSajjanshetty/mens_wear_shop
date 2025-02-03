@@ -8,6 +8,7 @@ const { HYDRA_PUBLIC_URL, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } =
   process.env;
 
 const callBack = async (req, res) => {
+  console.log("callback called");
   const { code, login_challenge } = req.query;
   console.log({ login_challenge });
   if (!code) {

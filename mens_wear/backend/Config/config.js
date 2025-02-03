@@ -14,8 +14,8 @@ function getLocalIp() {
 }
 
 const config = {
-  HOST: process.env.HOST || getLocalIp(),
-  PORT: process.env.PORT || 3000,
+  HOST: process.env.HOST_IP || "192.168.68.231",
+  PORT: process.env.PORT || 8000,
   HYDRA_URL: process.env.HYDRA_ADMIN_URL,
 };
 
