@@ -2,6 +2,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { motion } from "framer-motion";
+import '../components/NavbarComponent.css';
+import CustomerNavbar from "../components/CustomerNavbar";
 
 const UserDashboard = () => {
   const navigate = useNavigate(); // Hook for navigation
@@ -50,9 +52,10 @@ const UserDashboard = () => {
       initial="hidden"
       animate="visible"
       variants={navbarVariants}
-      style={{ minHeight: "100vh", background: "linear-gradient(135deg, #11998e, #38ef7d)" }}
+      style={{ minHeight: "100vh", background: "linear-gradient(135deg, #ff512f, #dd2476)" }}
     >
-      <Navbar bg="dark" variant="dark" expand="lg" className="py-3 shadow">
+      <CustomerNavbar />
+      {/* <Navbar bg="dark" expand="lg" className="custom-navbar py-3 shadow">
         <Container>
           <Navbar.Brand href="#home">User Dashboard</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -79,7 +82,7 @@ const UserDashboard = () => {
             </motion.button>
           </Navbar.Collapse>
         </Container>
-      </Navbar>
+      </Navbar> */}
       <Container className="text-white mt-5">
         <h1 className="text-center">Welcome to the User Dashboard</h1>
         <p className="text-center mt-3">

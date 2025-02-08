@@ -1,0 +1,14 @@
+/* src/styles/NavbarComponent.css */
+.custom-navbar {
+  background: linear-gradient(135deg, #cb1158, #2575fc) !important; /* Gradient color */
+  border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.custom-navbar .navbar-brand,
+.custom-navbar .nav-link {
+  color: white !important; /* Ensure text is visible */
+}
+
+.custom-navbar .nav-link:hover {
+  color: #f8f9fa !important; /* Light gray on hover */
+}
