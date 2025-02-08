@@ -5,17 +5,45 @@ const category = require("../Modal/Categories-Modal");
 //------   Add  category , post request ,  /add-category
 //-------------------------------------------------------------------------------`-------------
 const addCategory = async (req, res) => {
+  console.log(req.body);
+
   try {
+    // Check if category name is provided
+    if (!req.body.categoryName) {
+      return res.status(400).json({ message: "Category name is required" });
+    }
+
+    // Create new category
     const newCategory = new category(req.body);
+
+    // Save the new category to the database
     const createCategory = await newCategory.save();
 
-    res.send(createCategory);
+    // Send back the created category with a 201 (Created) status
+    res.status(201).json({
+      message: "Category created successfully",
+      category: createCategory,
+    });
     console.log(createCategory);
   } catch (error) {
-    console.log(" failed to add new category", error);
-    res.send(error);
+    // Handle different types of errors
+    console.log("Failed to add new category", error);
+
+    // Check if error is related to validation or database
+    if (error.name === "ValidationError") {
+      return res
+        .status(400)
+        .json({ message: "Validation error", error: error.message });
+    }
+
+    // Generic error handler for unexpected issues
+    res.status(500).json({
+      message: "Failed to add category",
+      error: error.message || "Unknown error",
+    });
   }
 };
+
 //--------------------------------------------------------------------------------------------
 //------  get all category , get request ,  /get-category
 //--------------------------------------------------------------------------------------------

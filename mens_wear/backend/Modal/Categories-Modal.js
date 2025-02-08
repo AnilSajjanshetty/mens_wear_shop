@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const categorySchema = new mongoose.Schema({
-  CategoryName: {
+  categoryName: {
     type: String,
     required: true,
   },
