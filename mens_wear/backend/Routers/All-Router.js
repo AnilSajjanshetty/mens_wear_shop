@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { login } = require("../Controller/Login-Controller");
+// const { login } = require("../Routers/login");  // uncomment this if u want to use Oauth login, and coomemt above
 const { oAuth } = require("../Routers/oauth");
 const { callBack } = require("../Routers/callback");
 const { concent } = require("../Routers/concent");

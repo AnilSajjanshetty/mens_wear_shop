@@ -38,7 +38,10 @@ const config = require("./Config/config"); // Import configuration file
 // const callbackRoutes = require("./Routers/callback"); // New callback route
 // const refreshTokenRoutes = require("./Routers/refresh-token");
 
-const { HOST, PORT } = config; // Destructure HOST and PORT
+// Destructure HOST and PORT
+
+const HOST = config.HOST;
+const PORT = config.PORT;
 app.use(express.urlencoded({ extended: true })); // For URL-encoded data
 app.use(cors());
 app.use(express.json());

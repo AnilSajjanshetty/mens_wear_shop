@@ -1,74 +1,113 @@
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const config = require("../Config/config");
 const users = require("../Modal/User-Modal");
 const roles = require("../Modal/Roles-Modal");
 const userRoles = require("../Modal/Users-Role-Modal");
-const axios = require("axios");
 const express = require("express");
 const router = express.Router();
-const config = require("../Config/config");
 
-console.log({ config });
-const HYDRA_ADMIN_URL = config.HYDRA_URL;
-console.log("HYDRA_ADMIN_URL:", HYDRA_ADMIN_URL);
+const ACCESS_TOKEN_EXPIRY = "15m";
+const REFRESH_TOKEN_EXPIRY = "7d";
+
+// In-memory storage for refresh tokens (Map)
+const refreshTokensMap = new Map();
+
+const generateAccessToken = (user) => {
+  return jwt.sign(
+    { userId: user.UserId, email: user.Email, roleId: user.roleId },
+    config.ACCESS_TOKEN_SECRET,
+    { expiresIn: ACCESS_TOKEN_EXPIRY }
+  );
+};
+
+const generateRefreshToken = (user) => {
+  return jwt.sign(
+    { userId: user.UserId, email: user.Email, roleId: user.roleId },
+    config.REFRESH_TOKEN_SECRET,
+    { expiresIn: REFRESH_TOKEN_EXPIRY }
+  );
+};
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  console.log(req.body);
   if (!email || !password) {
     return res.status(400).json({ message: "Email and password are required" });
   }
 
   try {
-    // Find the user by email
     const user = await users.findOne({ Email: email });
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Verify the password
     const isPasswordValid = await bcrypt.compare(password, user.Password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Retrieve the user's role ID from userRoles
     const userRoleRecord = await userRoles.findOne({ UserId: user.UserId });
     if (!userRoleRecord) {
       return res.status(403).json({ message: "User role not found" });
     }
 
-    // Retrieve the role details using RoleId
     const userRole = await roles.findOne({ RoleId: userRoleRecord.RoleId });
     if (!userRole) {
       return res.status(403).json({ message: "Role details not found" });
     }
 
-    // Handle Hydra login challenge
-    const challenge = login_challenge;
-    if (!challenge) {
-      return res.status(400).json({ message: "Login challenge is missing" });
-    }
+    const accessToken = generateAccessToken({
+      UserId: user.UserId,
+      Email: user.Email,
+      roleId: userRoleRecord.RoleId,
+    });
 
-    // Pass the user's role in the context field of the token
-    const loginResponse = await axios.put(
-      `${HYDRA_ADMIN_URL}/oauth2/auth/requests/login/accept`,
-      {
-        subject: user.UserId, // UserId as the subject
-        context: {
-          roleId: userRoleRecord.RoleId, // Pass RoleId
-          role: userRole, // Optional: Pass role name
-        },
-      },
-      { params: { login_challenge: challenge } }
-    );
+    const refreshToken = generateRefreshToken({
+      UserId: user.UserId,
+      Email: user.Email,
+      roleId: userRoleRecord.RoleId,
+    });
 
-    // Return the Hydra redirect URL
-    res.status(200).json({ redirectUrl: loginResponse.data.redirect_to });
+    // Store refresh token in Map
+    console.log({ accessToken, refreshToken });
+    refreshTokensMap.set(user.UserId, refreshToken);
+
+    res.status(200).json({
+      accessToken,
+      refreshToken,
+      userId: user.UserId,
+      roleId: userRoleRecord.RoleId,
+    });
   } catch (error) {
-    console.error("Error response:", error.response?.data);
-    console.error("Error message:", error.message);
+    console.error("Error:", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
-module.exports = { login };
+const refreshToken = async (req, res) => {
+  const { token } = req.body;
+  if (!token) {
+    return res.status(401).json({ message: "Refresh token is required" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, config.REFRESH_TOKEN_SECRET);
+    const storedToken = refreshTokensMap.get(decoded.userId);
+
+    if (!storedToken || storedToken !== token) {
+      return res.status(403).json({ message: "Invalid refresh token" });
+    }
+
+    const newAccessToken = generateAccessToken({
+      UserId: decoded.userId,
+      Email: decoded.email,
+      roleId: decoded.roleId,
+    });
+
+    res.status(200).json({ accessToken: newAccessToken });
+  } catch (error) {
+    return res.status(403).json({ message: "Invalid refresh token" });
+  }
+};
+
+module.exports = { login, refreshToken };

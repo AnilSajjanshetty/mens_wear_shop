@@ -1,24 +1,26 @@
 require("dotenv").config();
-const os = require("os");
-
-function getLocalIp() {
-  const networkInterfaces = os.networkInterfaces();
-  for (const iface in networkInterfaces) {
-    for (const net of networkInterfaces[iface]) {
-      if (net.family === "IPv4" && !net.internal) {
-        return net.address;
-      }
-    }
-  }
-  return "127.0.0.1"; // Fallback to localhost
-}
+const redis = require("redis");
 
 const config = {
-  HOST: process.env.HOST_IP || "192.168.68.231",
+  HOST: process.env.HOST_IP || "192.168.223.231",
   PORT: process.env.PORT || 8000,
   HYDRA_URL: process.env.HYDRA_ADMIN_URL,
+  ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
+  REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET,
+  REDIS_HOST: process.env.REDIS_HOST || "localhost",
+  REDIS_PORT: process.env.REDIS_PORT || 6379,
 };
 
+// const redisClient = redis.createClient({
+//   host: config.REDIS_HOST,
+//   port: config.REDIS_PORT,
+// });
+
+// redisClient
+//   .connect()
+//   .catch((err) => console.error("Redis connection error:", err));
+
+// module.exports = { config, redisClient };
 module.exports = config;
 
 // require('dotenv').config();
