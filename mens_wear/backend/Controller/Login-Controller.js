@@ -69,7 +69,7 @@ const login = async (req, res) => {
     });
 
     // Store refresh token in Map
-    console.log({ accessToken, refreshToken });
+
     refreshTokensMap.set(user.UserId, refreshToken);
 
     res.status(200).json({
@@ -110,4 +110,34 @@ const refreshToken = async (req, res) => {
   }
 };
 
-module.exports = { login, refreshToken };
+// Logout function - Remove refresh token from map
+const logout = async (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).json({ message: "Refresh token is required" });
+  }
+
+  try {
+    let userIdToRemove = null;
+
+    for (let [userId, storedToken] of refreshTokensMap.entries()) {
+      if (storedToken === token) {
+        userIdToRemove = userId;
+        break;
+      }
+    }
+
+    if (userIdToRemove) {
+      refreshTokensMap.delete(userIdToRemove); // Remove token from in-memory store
+      return res.status(200).json({ message: "Logged out successfully" });
+    } else {
+      return res.status(403).json({ message: "Invalid refresh token" });
+    }
+  } catch (error) {
+    console.error("Logout error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+module.exports = { login, refreshToken, logout };

@@ -2,6 +2,7 @@ import React from "react";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { motion } from "framer-motion";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
   const navbarVariants = {
@@ -15,7 +16,33 @@ const AdminDashboard = () => {
       transition: { duration: 0.3 },
     },
   };
+  const navigate = useNavigate()
+  // Logout Functionality
+  const handleLogout = async () => {
+    try {
+      const refreshToken = localStorage.getItem("refreshToken"); // Get stored refresh token
 
+      const response = await fetch("http://localhost:8000/api/v1/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: refreshToken }), // Send refresh token for logout
+      });
+
+      if (response.ok) {
+        localStorage.removeItem("access_token"); // Remove tokens from storage
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("roleId");
+        navigate("/"); // Redirect to home/login page
+      } else {
+        alert("Logout failed, please try again!");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
   return (
     <motion.div
       initial="hidden"
@@ -46,7 +73,7 @@ const AdminDashboard = () => {
               className="btn btn-danger"
               variants={buttonVariants}
               whileHover="hover"
-              onClick={() => alert("Logging out...")}
+              onClick={handleLogout} // Call logout function
             >
               Logout
             </motion.button>

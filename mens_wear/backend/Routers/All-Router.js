@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { login } = require("../Controller/Login-Controller");
+const { login, logout } = require("../Controller/Login-Controller");
 // const { login } = require("../Routers/login");  // uncomment this if u want to use Oauth login, and coomemt above
 const { oAuth } = require("../Routers/oauth");
 const { callBack } = require("../Routers/callback");
@@ -94,6 +94,7 @@ router.route("/edit-category/:categoryId").put(editCategory);
 router.route("/delete-category/:categoryId").delete(deleteCategory);
 
 router.route("/login").post(login);
+router.route("/logout").post(logout);
 router.route("/authorize").get(oAuth);
 router.route("/consent").get(concent);
 router.route("/callback").get(callBack);
