@@ -6,15 +6,20 @@ import AddCategoryForm from '../components/AddCategoryForm';
 import axios from 'axios';
 import SpinnerComponent from '../components/SpinnerComponent';
 import { FaEdit, FaTrash } from "react-icons/fa"; // Import icons
+
 const AllCategory = () => {
     const [showModal, setShowModal] = useState(false);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedCategory, setSelectedCategory] = useState(null); // Store category to edit
     const itemsPerPage = 10;
 
-    const handleCloseModal = () => setShowModal(false);
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setSelectedCategory(null); // Reset selected category when closing modal
+    };
     const handleShowModal = () => setShowModal(true);
 
     useEffect(() => {
@@ -36,9 +41,10 @@ const AllCategory = () => {
     const handleAddCategory = () => {
         handleCloseModal();
     };
-    const handleEditCategory = (categoryId) => {
-        alert(`Edit category with ID: ${categoryId}`);
-        // Add logic to handle edit action
+
+    const handleEditCategory = (category) => {
+        setSelectedCategory(category); // Set selected category for editing
+        handleShowModal();
     };
 
     const handleDeleteCategory = async (categoryId) => {
@@ -53,6 +59,7 @@ const AllCategory = () => {
             }
         }
     };
+
     // Pagination Logic
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -99,14 +106,14 @@ const AllCategory = () => {
                                             <FaEdit
                                                 className="text-primary"
                                                 style={{ cursor: "pointer" }}
-                                                onClick={() => handleEditCategory(category.CategoryId)}
+                                                onClick={() => handleEditCategory(category)}
                                             />
                                         </td>
                                         <td>
                                             <FaTrash
                                                 className="text-danger"
                                                 style={{ cursor: "pointer" }}
-                                                onClick={() => handleDeleteCategory(category.CategoryId)}
+                                                onClick={() => handleDeleteCategory(category._id)}
                                             />
                                         </td>
                                     </tr>
@@ -135,11 +142,12 @@ const AllCategory = () => {
                     </>
                 )}
 
-                {/* Add Category Modal */}
+                {/* Add/Edit Category Modal */}
                 <AddCategoryForm
                     show={showModal}
                     handleClose={handleCloseModal}
                     handleAddCategory={handleAddCategory}
+                    selectedCategory={selectedCategory} // Pass selected category for editing
                 />
             </Container>
         </motion.div>

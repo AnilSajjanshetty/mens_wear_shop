@@ -1,67 +1,48 @@
-// src/components/AddCategoryForm.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 
-const AddCategoryForm = ({ show, handleClose, handleAddCategory }) => {
-    const [categoryName, setCategoryName] = useState('');
+const AddCategoryForm = ({ show, handleClose, handleAddCategory, selectedCategory }) => {
+    const [categoryName, setCategoryName] = useState("");
+
+    useEffect(() => {
+        if (selectedCategory) {
+            setCategoryName(selectedCategory.categoryName);
+        } else {
+            setCategoryName("");
+        }
+    }, [selectedCategory]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (categoryName.trim() === '') {
-            alert("Category name cannot be empty.");
-            return;
-        }
-
         try {
-            // Make the POST request using Axios
-            const response = await axios.post('http://localhost:8000/api/v1/add-category',
-
-
-                { categoryName: categoryName },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`, // Include access token
-                    }
-                });
-            if (response.status === 201) {
-                handleAddCategory(); // Callback to update the categories list
-                alert('Category added successfully!');
-                setCategoryName("")
+            if (selectedCategory) {
+                // Update existing category
+                await axios.put(`http://192.168.223.231:8000/api/v1/edit-category/${selectedCategory.CategoryId}`, { categoryName });
+                alert("Category updated successfully!");
             } else {
-                alert('Failed to add category!');
-                setCategoryName("")
+                // Add new category
+                await axios.post('http://192.168.223.231:8000/api/v1/add-category', { categoryName });
+                alert("Category added successfully!");
             }
-
+            handleAddCategory();
         } catch (error) {
-            console.error('Error adding category:', error);
-            alert('An error occurred while adding the category.');
-            setCategoryName("")
-
+            alert("Error saving category!");
         }
-        handleClose(); // Close the modal
     };
 
     return (
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>Add New Category</Modal.Title>
+                <Modal.Title>{selectedCategory ? "Edit Category" : "Add Category"}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
-                    <Form.Group className="mb-3" controlId="categoryName">
+                    <Form.Group>
                         <Form.Label>Category Name</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="Enter category name"
-                            value={categoryName}
-                            onChange={(e) => setCategoryName(e.target.value)}
-                        />
+                        <Form.Control type="text" value={categoryName} onChange={(e) => setCategoryName(e.target.value)} required />
                     </Form.Group>
-                    <Button variant="primary" type="submit">
-                        Add Category
-                    </Button>
+                    <Button type="submit" className="mt-3">{selectedCategory ? "Update" : "Add"}</Button>
                 </Form>
             </Modal.Body>
         </Modal>
