@@ -6,20 +6,7 @@ const upload = require("../Config/MulterConfig");
 //--------------------------------------------------------------------------------------------
 //------   Add  productt , post request ,  /add-product
 //--------------------------------------------------------------------------------------------
-// const addProduct = async (req,res) =>{
-//     try {
-//         const newProduct = new products(req.body);
-//         const createproduct = await newProduct.save();
-
-//         res.send(createproduct);
-//         console.log(createproduct);
-//       } catch (error) {
-//         console.log(" failed to add new product",error)
-//         res.send(error);
-//       }
-// }
 const addProduct = async (req, res) => {
-  console.log("ADD PRODUCT", req.body);
   try {
     upload(req, res, async (err) => {
       if (err instanceof multer.MulterError) {
@@ -35,10 +22,13 @@ const addProduct = async (req, res) => {
           .json({ error: "At least one image is required!" });
       }
 
-      // Create product data with multiple image paths
+      // Explicitly add image paths to req.body
+      req.body.Image = req.files.map(
+        (file) => "UploadedFiles/" + file.filename
+      );
+      // Create product data with image paths
       const newProductData = {
         ...req.body,
-        Image: req.files.map((file) => "UploadedFiles/" + file.filename), // Store array of image paths
       };
 
       // Save the product to the database
@@ -76,7 +66,6 @@ const getProduct = async (req, res) => {
     }));
 
     res.status(200).json(productsWithCategoryName);
-    console.log(productsWithCategoryName); // Log the products with the categoryName
   } catch (error) {
     console.error("Failed to get products", error);
 
@@ -98,7 +87,6 @@ const getSingleProduct = async (req, res) => {
 
     if (product) {
       res.send(product);
-      console.log(product);
     } else {
       res.status(404).send("Product not found");
     }
@@ -184,7 +172,6 @@ const deleteProduct = async (req, res) => {
 
     if (deletedProduct) {
       res.send("Product deleted successfully");
-      console.log("Deleted product:", deletedProduct);
     } else {
       res.status(404).send("Product not found");
     }

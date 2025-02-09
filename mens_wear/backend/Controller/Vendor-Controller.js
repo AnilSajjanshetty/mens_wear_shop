@@ -10,7 +10,6 @@ const addVendor = async (req, res) => {
     const createVendor = await newVendor.save();
 
     res.send(createVendor);
-    console.log(createVendor);
   } catch (error) {
     console.log(" failed to add new Vendor", error);
     res.send(error);
@@ -24,7 +23,6 @@ const getVendor = async (req, res) => {
     const allVendor = await vendors.find({});
 
     res.send(allVendor);
-    console.log(allVendor);
   } catch (error) {
     console.log("failed to get Vendor", error);
     res.send(error);
@@ -40,7 +38,6 @@ const getSingleVendor = async (req, res) => {
 
     if (vendor) {
       res.send(vendor);
-      console.log(vendor);
     } else {
       res.status(404).send("Vendor not found");
     }
@@ -60,7 +57,6 @@ const getSingleVendorByCategoryId = async (req, res) => {
 
     if (vendorByCategoryId) {
       res.send(vendorByCategoryId);
-      console.log(vendorByCategoryId);
     } else {
       res.status(404).send("category type Vendor not found");
     }
@@ -85,7 +81,6 @@ const editVendor = async (req, res) => {
     );
 
     res.send(updateSingleVendor);
-    console.log(updateSingleVendor);
   } catch (error) {
     console.log("failed to updated Vendor", error);
     res.send(error);
@@ -103,7 +98,6 @@ const deleteVendor = async (req, res) => {
 
     if (deletedVendor) {
       res.send("Vendor deleted successfully");
-      console.log("Deleted Vendor:", deletedVendor);
     } else {
       res.status(404).send("Vendor not found");
     }

@@ -5,8 +5,6 @@ const category = require("../Modal/Categories-Modal");
 //------   Add  category , post request ,  /add-category
 //-------------------------------------------------------------------------------`-------------
 const addCategory = async (req, res) => {
-  console.log(req.body);
-
   try {
     // Check if category name is provided
     if (!req.body.categoryName) {
@@ -24,7 +22,6 @@ const addCategory = async (req, res) => {
       message: "Category created successfully",
       category: createCategory,
     });
-    console.log(createCategory);
   } catch (error) {
     // Handle different types of errors
     console.log("Failed to add new category", error);
@@ -148,7 +145,6 @@ const deleteCategory = async (req, res) => {
 
     if (deletedCategory) {
       res.send("Category deleted successfully");
-      console.log("deleted Category:", deletedCategory);
     } else {
       res.status(404).send("Category not found");
     }

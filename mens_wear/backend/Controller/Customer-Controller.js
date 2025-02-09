@@ -16,7 +16,6 @@ const home = async (req, res) => {
 //------   Register Customer , post request ,  /register-customer
 //--------------------------------------------------------------------------------------------
 const registerCustomer = async (req, res) => {
-  console.log(req.body);
   try {
     const register = new users(req.body);
     const createcust = await register.save();
@@ -40,8 +39,6 @@ const registerCustomer = async (req, res) => {
       user: createcust,
       role: createRole,
     });
-
-    console.log({ createcust, createRole });
   } catch (error) {
     console.error("Registration failed", error);
     res.status(500).send({
@@ -58,7 +55,6 @@ const getAllCustomer = async (req, res) => {
     const allCustomers = await users.find({});
 
     res.send(allCustomers);
-    console.log(allCustomers);
   } catch (error) {
     console.log("Login failed", error);
     res.send(error);
@@ -74,7 +70,6 @@ const getSingleCustomer = async (req, res) => {
 
     if (Customer) {
       res.send(Customer);
-      console.log(Customer);
     } else {
       res.status(404).send("Customer not found");
     }
@@ -101,7 +96,6 @@ const editCustomer = async (req, res) => {
     );
 
     res.send(updateCustomer);
-    console.log(updateCustomer);
   } catch (error) {
     console.log("Update failed", error);
     res.send(error);
@@ -120,7 +114,6 @@ const deleteCustomer = async (req, res) => {
 
     if (deletedCustomer) {
       res.send("Vendor deleted successfully");
-      console.log("Deleted customer:", deletedCustomer);
     } else {
       res.status(404).send("customer not found");
     }

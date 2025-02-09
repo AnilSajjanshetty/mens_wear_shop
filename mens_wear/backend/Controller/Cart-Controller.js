@@ -10,7 +10,6 @@ const addCart = async (req, res) => {
     const createCart = await newCart.save();
 
     res.send(createCart);
-    console.log(createCart);
   } catch (error) {
     console.log(" failed to add new cart", error);
     res.send(error);
@@ -24,7 +23,6 @@ const getCart = async (req, res) => {
     const allCarts = await carts.find({});
 
     res.send(allCarts);
-    console.log(allCarts);
   } catch (error) {
     console.log("failed to get cart", error);
     res.send(error);
@@ -37,10 +35,8 @@ const getSingleCart = async (req, res) => {
   try {
     const customerId = req.params.customerId;
     const cart = await carts.find({ CustomerId: customerId });
-    console.log("customerId", customerId);
     if (cart) {
       res.send(cart);
-      console.log(cart);
     } else {
       res.status(404).send("cart not found");
     }
@@ -68,7 +64,6 @@ const editCart = async (req, res) => {
     );
 
     res.send(updateSingleCart);
-    console.log(updateSingleCart);
   } catch (error) {
     console.log("failed to updated cart", error);
     res.send(error);
@@ -84,7 +79,6 @@ const deleteCart = async (req, res) => {
 
     if (deletedCart) {
       res.send("cart deleted successfully");
-      console.log("cart product:", deletedCart);
     } else {
       res.status(404).send("cart not found");
     }
