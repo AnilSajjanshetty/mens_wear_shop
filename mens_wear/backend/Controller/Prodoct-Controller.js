@@ -98,30 +98,6 @@ const getSingleProduct = async (req, res) => {
 //--------------------------------------------------------------------------------------------
 //------   Edit Product , put request ,  /Edit-product
 //--------------------------------------------------------------------------------------------
-// const editproduct = async (req,res) =>{
-//     try {
-
-//     const updateProduct=
-//         {
-//             ProductId:req.body.ProductId,
-//             ProductName: req.body.ProductName,
-//             Description: req.body.Description,
-//             Price: req.body.Price,
-//             Rating: req.body.Rating,
-//             Stock: req.body.Stock,
-//             CategoryId: req.body.CategoryId,
-//             VendorId: req.body.VendorId,
-//             Image: req.body.Image,
-//           }
-//         const updateSingleProduct = await products.updateOne({ ProductId: req.params.productId },{$set:updateProduct})
-
-//         res.send(updateSingleProduct);
-//         console.log(updateSingleProduct);
-//       } catch (error) {
-//         console.log("failed to updated product",error)
-//         res.send(error);
-//       }
-// }
 const editproduct = async (req, res) => {
   try {
     upload(req, res, async (err) => {
@@ -131,7 +107,7 @@ const editproduct = async (req, res) => {
         return res.status(400).json({ error: err.message });
       }
 
-      // If file upload is successful
+      // Prepare updated product fields
       const updateProduct = {
         ProductName: req.body.ProductName,
         Description: req.body.Description,
@@ -139,12 +115,13 @@ const editproduct = async (req, res) => {
         Rating: req.body.Rating,
         Stock: req.body.Stock,
         CategoryId: req.body.CategoryId,
-        // VendorId: req.body.VendorId,
       };
 
-      // Check if a new file is uploaded
-      if (req.file) {
-        updateProduct.Image = "UploadedFiles/" + req.file.filename;
+      // If new files are uploaded, update images
+      if (req.files && req.files.length > 0) {
+        updateProduct.Image = req.files.map(
+          (file) => "UploadedFiles/" + file.filename
+        );
       }
 
       const updateSingleProduct = await products.updateOne(
@@ -152,10 +129,18 @@ const editproduct = async (req, res) => {
         { $set: updateProduct }
       );
 
-      res.send(updateProduct);
+      if (updateSingleProduct.modifiedCount === 0) {
+        return res
+          .status(404)
+          .json({ error: "Product not found or no changes applied" });
+      }
+
+      res
+        .status(200)
+        .json({ message: "Product updated successfully", updateProduct });
     });
   } catch (error) {
-    console.log("Failed to update product", error);
+    console.error("Failed to update product", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

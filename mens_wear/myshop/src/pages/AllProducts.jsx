@@ -10,6 +10,7 @@ import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 const AllProducts = () => {
     const [showModal, setShowModal] = useState(false);
     const [products, setProducts] = useState([]);
+    const [selectedProduct, setSelectedProduct] = useState(null);
 
     useEffect(() => {
         fetchProducts();
@@ -26,6 +27,24 @@ const AllProducts = () => {
         }
     };
 
+    const handleEdit = (product) => {
+        setSelectedProduct(product);
+        setShowModal(true);
+    };
+
+    const handleDelete = async (productId) => {
+        if (window.confirm("Are you sure you want to delete this product?")) {
+            try {
+                await axios.delete(`http://localhost:8000/api/v1/delete-product/${productId}`);
+                fetchProducts();
+                alert("Product deleted successfully");
+            } catch (error) {
+                console.error("Error deleting product", error);
+                alert("Failed to delete product");
+            }
+        }
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, y: -50 }}
@@ -39,7 +58,7 @@ const AllProducts = () => {
             <NavbarComponent />
             <Container>
                 <h2 className="text-white mb-4">Add and Manage Products</h2>
-                <Button className="btn btn-light mb-3" onClick={() => setShowModal(true)}>
+                <Button className="btn btn-light mb-3" onClick={() => { setShowModal(true); setSelectedProduct(null); }}>
                     Add Product
                 </Button>
 
@@ -90,8 +109,8 @@ const AllProducts = () => {
                                             {/* Icons for Actions */}
                                             <div className="d-flex justify-content-between mt-3">
                                                 <FaEye size={20} className="text-primary cursor-pointer" />
-                                                <FaEdit size={20} className="text-warning cursor-pointer" />
-                                                <FaTrash size={20} className="text-danger cursor-pointer" />
+                                                <FaEdit size={20} className="text-warning cursor-pointer" onClick={() => handleEdit(product)} />
+                                                <FaTrash size={20} className="text-danger cursor-pointer" onClick={() => handleDelete(product.ProductId)} />
                                             </div>
                                         </Card.Body>
                                     </Col>
@@ -102,11 +121,12 @@ const AllProducts = () => {
                 </Row>
             </Container>
 
-            {/* Add Product Modal */}
+            {/* Add/Edit Product Modal */}
             <AddProductModal
                 show={showModal}
                 handleClose={() => setShowModal(false)}
                 refreshProducts={fetchProducts}
+                product={selectedProduct}
             />
         </motion.div>
     );
