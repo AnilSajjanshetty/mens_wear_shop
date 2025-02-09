@@ -19,6 +19,7 @@ const upload = require("../Config/MulterConfig");
 //       }
 // }
 const addProduct = async (req, res) => {
+  console.log("ADD PRODUCT", req.body);
   try {
     upload(req, res, async (err) => {
       if (err instanceof multer.MulterError) {
@@ -27,21 +28,27 @@ const addProduct = async (req, res) => {
         return res.status(400).json({ error: err.message });
       }
 
-      // If file upload is successful
-      console.log("========================================================");
-      console.log("file name=", req.file);
+      // Ensure files are uploaded
+      if (!req.files || req.files.length === 0) {
+        return res
+          .status(400)
+          .json({ error: "At least one image is required!" });
+      }
+
+      // Create product data with multiple image paths
       const newProductData = {
         ...req.body,
-        Image: "UploadedFiles/" + req.file.filename,
+        Image: req.files.map((file) => "UploadedFiles/" + file.filename), // Store array of image paths
       };
+
+      // Save the product to the database
       const newProduct = new products(newProductData);
       const createdProduct = await newProduct.save();
 
-      res.send(createdProduct);
-      console.log(createdProduct);
+      res.status(201).json(createdProduct);
     });
   } catch (error) {
-    console.log("Failed to add new product", error);
+    console.error("Failed to add new product:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -51,15 +58,36 @@ const addProduct = async (req, res) => {
 //--------------------------------------------------------------------------------------------
 const getProduct = async (req, res) => {
   try {
-    const allProducts = await products.find({});
+    // Fetch all products and populate CategoryId with only the categoryName field
+    const allProducts = await products
+      .find({})
+      .populate("CategoryId", "categoryName") // Populate only categoryName from Category model
+      .exec();
 
-    res.send(allProducts);
-    console.log(allProducts);
+    if (!allProducts || allProducts.length === 0) {
+      return res.status(404).json({ message: "No products found" });
+    }
+
+    // Map over allProducts to include categoryName directly in the product object
+    const productsWithCategoryName = allProducts.map((product) => ({
+      ...product.toObject(),
+      categoryName: product.CategoryId.categoryName, // Extract categoryName and add it directly
+      CategoryId: undefined, // Remove the CategoryId object
+    }));
+
+    res.status(200).json(productsWithCategoryName);
+    console.log(productsWithCategoryName); // Log the products with the categoryName
   } catch (error) {
-    console.log("failed to get products", error);
-    res.send(error);
+    console.error("Failed to get products", error);
+
+    // Send a response with a generic error message and status code
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: error.message || "An unexpected error occurred",
+    });
   }
 };
+
 //--------------------------------------------------------------------------------------------
 //------  get single products , get request ,  /get-product/:poductId
 //--------------------------------------------------------------------------------------------

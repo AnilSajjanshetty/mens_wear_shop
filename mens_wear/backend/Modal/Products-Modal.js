@@ -17,8 +17,8 @@ const productSchema = new mongoose.Schema({
   },
   Rating: {
     type: Object,
-    required: true,
     trim: true,
+    default: 0, // Default value for rating
   },
   Stock: {
     type: String,
@@ -36,7 +36,7 @@ const productSchema = new mongoose.Schema({
   //     required: true,
   //   },
   Image: {
-    type: String,
+    type: [String], // Array of image paths
     required: true,
     trim: true,
   },
