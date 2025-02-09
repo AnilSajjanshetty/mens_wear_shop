@@ -110,7 +110,7 @@ const deleteCategory = async (req, res) => {
 
     if (deletedCategory) {
       res.send("Category deleted successfully");
-      console.log("deleted Category:", deletedCart);
+      console.log("deleted Category:", deletedCategory);
     } else {
       res.status(404).send("Category not found");
     }
