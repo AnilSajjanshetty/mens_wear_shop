@@ -1,6 +1,6 @@
 // src/components/AddProductModal.js
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import { Modal, Button, Form, Row, Col, Image } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 
@@ -15,14 +15,13 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
 
     useEffect(() => {
         if (product) {
-            // Populate form with existing product data when editing
             setValue("ProductName", product.ProductName);
             setValue("Description", product.Description);
             setValue("Price", product.Price);
             setValue("Stock", product.Stock);
             setValue("CategoryId", product.CategoryId);
         } else {
-            reset(); // Reset form if adding a new product
+            reset();
         }
     }, [product, setValue, reset]);
 
@@ -46,13 +45,11 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
 
         try {
             if (product) {
-                // Update existing product
                 await axios.put(`http://192.168.223.231:8000/api/v1/edit-product/${product.ProductId}`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 alert("Product updated successfully");
             } else {
-                // Add new product
                 await axios.post('http://192.168.223.231:8000/api/v1/add-product', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
@@ -65,6 +62,16 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
             console.error("Error saving product", error);
             alert("Failed to save product");
         }
+    };
+
+    const handleRemoveImage = (index) => {
+        const updatedImages = selectedImages.filter((_, i) => i !== index);
+        setSelectedImages(updatedImages);
+    };
+
+    const handleImageSelection = (e) => {
+        const files = Array.from(e.target.files); // Convert FileList to array
+        setSelectedImages(prevImages => [...prevImages, ...files]);
     };
 
     return (
@@ -101,8 +108,51 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Upload Images</Form.Label>
-                        <Form.Control type="file" name="Image" multiple onChange={(e) => setSelectedImages([...e.target.files])} />
+                        <Form.Control
+                            type="file"
+                            name="Image"
+                            multiple
+                            onChange={handleImageSelection}
+                        />
                     </Form.Group>
+
+                    {/* Display selected images */}
+                    <Row>
+                        {selectedImages.length > 0 && selectedImages.map((image, index) => (
+                            <Col key={index} xs={6} md={4} lg={3} className="mb-2">
+                                <div style={{ position: 'relative' }} className='g-0 d-flex align-items-start'>
+                                    <Image
+                                        src={URL.createObjectURL(image)}
+                                        alt={`Selected Image ${index + 1}`}
+                                        style={{ width: '60px', height: '60px', objectFit: 'cover' }}
+                                    />
+                                    <Button
+                                        variant="danger"
+                                        size="sm"
+                                        style={{
+
+                                            top: '-5px',
+                                            right: '-5px',
+                                            padding: '0',
+                                            width: '20px',
+                                            height: '20px',
+                                            borderRadius: '50%',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            fontSize: '14px', // Adjust font size for the cross
+                                            lineHeight: '1',  // Adjust line height to help with vertical centering
+                                        }}
+                                        onClick={() => handleRemoveImage(index)}
+                                    >
+                                        &times;
+                                    </Button>
+
+                                </div>
+                            </Col>
+                        ))}
+                    </Row>
+
                     <Button variant="primary" type="submit">
                         {product ? "Update Product" : "Add Product"}
                     </Button>

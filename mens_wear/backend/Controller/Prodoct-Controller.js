@@ -62,7 +62,7 @@ const getProduct = async (req, res) => {
     const productsWithCategoryName = allProducts.map((product) => ({
       ...product.toObject(),
       categoryName: product.CategoryId.categoryName, // Extract categoryName and add it directly
-      CategoryId: undefined, // Remove the CategoryId object
+      CategoryId: product.CategoryId._id, // Remove the CategoryId object
     }));
 
     res.status(200).json(productsWithCategoryName);
