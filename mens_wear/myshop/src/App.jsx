@@ -35,7 +35,7 @@ function App() {
 
         {/* Protected Routes for User (roleId = 3) */}
         <Route path="/user" element={<ProtectedRoute element={<UserDashboard />} allowedRoles={[userRoleId]} />} />
-        <Route path="/user/myproducts" element={<ProtectedRoute element={<MyProducts />} allowedRoles={[userRoleId]} />} />
+        <Route path="/user/products" element={<ProtectedRoute element={<MyProducts />} allowedRoles={[userRoleId]} />} />
         <Route path="/user/mycart" element={<ProtectedRoute element={<MyCart />} allowedRoles={[userRoleId]} />} />
       </Routes>
     </Router>

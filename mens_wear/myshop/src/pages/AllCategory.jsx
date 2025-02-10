@@ -72,7 +72,7 @@ const AllCategory = () => {
         <motion.div
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0, transition: { duration: 0.8 } }}
-            style={{ minHeight: "100vh", background: "linear-gradient(135deg, #ff512f, #dd2476)" }}
+            style={{ minHeight: "100vh", background: "linear-gradient(135deg, #ff512f, #dd2476)", padding: "1.25rem", }}
         >
             <NavbarComponent />
             <Container>

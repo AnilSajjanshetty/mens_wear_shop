@@ -50,8 +50,8 @@ const CustomerNavbar = () => {
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="me-auto">
-                            <Nav.Link href="/user/myproducts" className="text-white fw-semibold">
-                                My Products
+                            <Nav.Link href="/user/products" className="text-white fw-semibold">
+                                Products
                             </Nav.Link>
                             <Nav.Link href="/user/mycart" className="text-white fw-semibold">
                                 My Cart

@@ -13,7 +13,7 @@ const MyCart = () => {
             initial="hidden"
             animate="visible"
             variants={navbarVariants}
-            style={{ minHeight: "100vh", background: "linear-gradient(135deg, #ff512f, #dd2476)" }}
+            style={{ minHeight: "100vh", background: "linear-gradient(135deg, #ff512f, #dd2476)", padding: "1.25rem" }}
         >
             <CustomerNavbar />
             <Container className="text-white mt-5">

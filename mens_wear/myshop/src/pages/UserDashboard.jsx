@@ -52,7 +52,7 @@ const UserDashboard = () => {
       initial="hidden"
       animate="visible"
       variants={navbarVariants}
-      style={{ minHeight: "100vh", background: "linear-gradient(135deg, #ff512f, #dd2476)" }}
+      style={{ minHeight: "100vh", background: "linear-gradient(135deg, #ff512f, #dd2476)", padding: "1.25rem" }}
     >
       <CustomerNavbar />
       {/* <Navbar bg="dark" expand="lg" className="custom-navbar py-3 shadow">

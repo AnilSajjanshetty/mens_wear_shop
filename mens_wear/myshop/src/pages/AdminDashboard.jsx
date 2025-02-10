@@ -51,7 +51,7 @@ const AdminDashboard = () => {
         animate="visible"
         variants={navbarVariants}
         style={{
-          minHeight: "100vh", background: "linear-gradient(135deg, #ff512f, #dd2476)"
+          minHeight: "100vh", background: "linear-gradient(135deg, #ff512f, #dd2476)", padding: "1.25rem",
         }}
       >
         <NavbarComponent />
