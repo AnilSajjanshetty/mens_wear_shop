@@ -5,9 +5,11 @@ import { motion } from "framer-motion";
 import AddCategoryForm from '../components/AddCategoryForm';
 import axios from 'axios';
 import SpinnerComponent from '../components/SpinnerComponent';
-import { FaEdit, FaTrash } from "react-icons/fa"; // Import icons
-
+import { FaEdit, FaTrash, FaEye } from "react-icons/fa"; // Import icons
+import config from "../../config"
+import { useNavigate } from 'react-router-dom';
 const AllCategory = () => {
+    const server = config.server
     const [showModal, setShowModal] = useState(false);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -25,7 +27,7 @@ const AllCategory = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://192.168.223.231:8000/api/v1/get-category');
+                const response = await axios.get(`${server}/get-category`);
                 setCategories(response.data || []);
             } catch (err) {
                 setError('Failed to fetch categories');
@@ -51,7 +53,7 @@ const AllCategory = () => {
         const confirmDelete = window.confirm("Are you sure you want to delete this category?");
         if (confirmDelete) {
             try {
-                await axios.delete(`http://192.168.223.231:8000/api/v1/delete-category/${categoryId}`);
+                await axios.delete(`${server}/delete-category/${categoryId}`);
                 setCategories(categories.filter(category => category._id !== categoryId));
                 alert("Category deleted successfully!");
             } catch (error) {
@@ -67,7 +69,13 @@ const AllCategory = () => {
     const totalPages = Math.ceil(categories.length / itemsPerPage);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    //======================================================================
+    const navigate = useNavigate()
+    const handleViewProducts = (category) => {
+        const categoryId = category._id
+        navigate(`/admin/category/${categoryId}`);
 
+    }
     return (
         <motion.div
             initial={{ opacity: 0, y: -50 }}
@@ -93,6 +101,7 @@ const AllCategory = () => {
                                 <tr>
                                     <th>Sr.No.</th>
                                     <th>Category Name</th>
+                                    <th>View Products</th>
                                     <th>Edit</th>
                                     <th>Delete</th>
                                 </tr>
@@ -102,6 +111,13 @@ const AllCategory = () => {
                                     <tr key={category?._id}>
                                         <td>{indexOfFirstItem + index + 1}</td>
                                         <td>{category?.categoryName}</td>
+                                        <td>
+                                            <FaEye
+                                                className="text-info"
+                                                style={{ cursor: "pointer" }}
+                                                onClick={() => handleViewProducts(category)}
+                                            />
+                                        </td>
                                         <td>
                                             <FaEdit
                                                 className="text-primary"

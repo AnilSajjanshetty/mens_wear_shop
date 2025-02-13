@@ -3,16 +3,17 @@ import { Container, Card, Button, Row, Col, Spinner } from "react-bootstrap";
 import CustomerNavbar from "../components/CustomerNavbar";
 import { motion } from "framer-motion";
 import axios from "axios";
+import config from "../../config";
 
 const MyProducts = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    const server = config.server
     // Fetch products from the API
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get("http://192.168.223.231:8000/api/v1/get-product");
+                const response = await axios.get(`${server}/get-product`);
                 setProducts(response.data);
             } catch (error) {
                 console.error("Error fetching products:", error);

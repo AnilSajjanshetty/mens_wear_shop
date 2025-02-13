@@ -6,20 +6,20 @@ import axios from 'axios';
 import { NavbarCollapse } from 'react-bootstrap';
 import FooterGuest from '../components/FooterGuest';
 import NavbarGuest from '../components/NavBarGuest';
+import config from '../../config';
 
 const RegisterPage = ({ closeModal, openLoginModal }) => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
-
+  const server = config.server
   const handleRegister = async (data) => {
     try {
-      const response = await axios.post('http://192.168.223.231:8000/api/v1/register-customer', {
+      const response = await axios.post(`${server}/register-customer`, {
         userName: data.name,
         Email: data.email,
         Password: data.password,
         MobileNo: data.mobile,
         Address: data.address,
       });
-      console.log('Registration successful:', response.data);
       closeModal(); // Close modal on successful registration
     } catch (error) {
       console.error('Registration error:', error.response?.data || error.message);

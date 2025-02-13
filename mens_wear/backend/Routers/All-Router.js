@@ -89,7 +89,7 @@ router
 //-------------------------------------------------------------------------------------
 router.route("/add-category").post(addCategory);
 router.route("/get-category").get(getCategory);
-router.route("/get-category/:categoryId").get(getSingleCategory);
+router.route("/get-products-by-category/:categoryId").get(getSingleCategory);
 router.route("/edit-category/:categoryId").put(editCategory);
 router.route("/delete-category/:categoryId").delete(deleteCategory);
 

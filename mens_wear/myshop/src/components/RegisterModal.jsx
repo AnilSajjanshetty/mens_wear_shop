@@ -5,18 +5,17 @@ import { useForm } from 'react-hook-form';
 import axios from 'axios';
 
 const RegisterModal = ({ closeModal, openLoginModal }) => {
-  const { register, handleSubmit,watch, formState: { errors } } = useForm();
+  const { register, handleSubmit, watch, formState: { errors } } = useForm();
 
   const handleRegister = async (data) => {
     try {
-      const response = await axios.post('http://192.168.43.231:3000/api/v1/register-customer',  {
+      const response = await axios.post('http://192.168.43.231:3000/api/v1/register-customer', {
         userName: data.name,
         Email: data.email,
         Password: data.password,
         MobileNo: data.mobile,
         Address: data.address,
       });
-      console.log('Registration successful:', response.data);
       closeModal(); // Close modal on successful registration
     } catch (error) {
       console.error('Registration error:', error.response?.data || error.message);
@@ -90,8 +89,8 @@ const RegisterModal = ({ closeModal, openLoginModal }) => {
               <small className="text-danger">{errors.email.message}</small>
             )}
           </div>
-             {/* Mobile Number Field */}
-           <div className="mb-3">
+          {/* Mobile Number Field */}
+          <div className="mb-3">
             <label className="form-label">Mobile Number</label>
             <input
               type="text"

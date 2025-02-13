@@ -3,12 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Row, Col, Image } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
+import config from '../../config';
 
 const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
     const { register, handleSubmit, reset, setValue } = useForm();
     const [categories, setCategories] = useState([]);
     const [selectedImages, setSelectedImages] = useState([]);
-
+    const server = config.server
     useEffect(() => {
         fetchCategories();
     }, []);
@@ -27,7 +28,7 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get('http://localhost:8000/api/v1/get-category');
+            const response = await axios.get(`${server}/get-category`);
             setCategories(response.data || []);
         } catch (error) {
             console.error("Failed to fetch categories", error);
@@ -45,12 +46,12 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
 
         try {
             if (product) {
-                await axios.put(`http://192.168.223.231:8000/api/v1/edit-product/${product.ProductId}`, formData, {
+                await axios.put(`${server}/edit-product/${product.ProductId}`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 alert("Product updated successfully");
             } else {
-                await axios.post('http://192.168.223.231:8000/api/v1/add-product', formData, {
+                await axios.post(`${server}/add-product`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 alert("Product added successfully");

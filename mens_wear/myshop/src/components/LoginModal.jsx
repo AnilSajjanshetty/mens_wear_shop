@@ -10,7 +10,7 @@ const LoginModal = ({ closeModal, openRegisterModal }) => {
 
   const handleLogin = async (data) => {
     const urlParams = new URLSearchParams(window.location.search);
-    const challenge =   "anils";
+    const challenge = "anils";
 
     if (!challenge) {
       console.error("Login challenge is missing.");
@@ -23,10 +23,9 @@ const LoginModal = ({ closeModal, openRegisterModal }) => {
       login_challenge: challenge, // Pass the challenge here
     };
 
-   
+
     try {
       const response = await axios.post('http://192.168.43.231:3000/api/v1/login', loginData);
-      console.log('Login successful:', response.data);
 
       // Store the access token and role in localStorage
       const { access_token, userId, roleId, roleDetails } = response.data;

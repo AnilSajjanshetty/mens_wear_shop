@@ -2,7 +2,7 @@ require("dotenv").config();
 const redis = require("redis");
 
 const config = {
-  HOST: process.env.HOST_IP || "192.168.223.231",
+  HOST: process.env.HOST_IP,
   PORT: process.env.PORT || 8000,
   HYDRA_URL: process.env.HYDRA_ADMIN_URL,
   ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,

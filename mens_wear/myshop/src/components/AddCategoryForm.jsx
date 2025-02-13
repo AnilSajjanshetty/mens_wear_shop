@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
+import config from '../../config';
 
 const AddCategoryForm = ({ show, handleClose, handleAddCategory, selectedCategory }) => {
     const [categoryName, setCategoryName] = useState("");
-
+    const server = config.server
     useEffect(() => {
         if (selectedCategory) {
             setCategoryName(selectedCategory.categoryName);
@@ -18,11 +19,11 @@ const AddCategoryForm = ({ show, handleClose, handleAddCategory, selectedCategor
         try {
             if (selectedCategory) {
                 // Update existing category
-                await axios.put(`http://192.168.223.231:8000/api/v1/edit-category/${selectedCategory.CategoryId}`, { categoryName });
+                await axios.put(`${server}/edit-category/${selectedCategory.CategoryId}`, { categoryName });
                 alert("Category updated successfully!");
             } else {
                 // Add new category
-                await axios.post('http://192.168.223.231:8000/api/v1/add-category', { categoryName });
+                await axios.post(`${server}/add-category`, { categoryName });
                 alert("Category added successfully!");
             }
             handleAddCategory();

@@ -5,15 +5,16 @@ import axios from 'axios';
 import { BrowserRouter as Router, useNavigate } from 'react-router-dom';
 import NavbarGuest from '../components/NavBarGuest';
 import FooterGuest from '../components/FooterGuest';
+import config from '../../config';
 
 const LoginPage = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const navigate = useNavigate(); // To handle redirection after login
-
+  const server = config.server
   const handleLogin = async (data) => {
 
     try {
-      const response = await axios.post('http://192.168.223.231:8000/api/v1/login', data);
+      const response = await axios.post(`${server}/login`, data);
 
 
       // Store the access token and role in localStorage

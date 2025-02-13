@@ -1,5 +1,6 @@
 require("../DataBase/DbConnection");
 const category = require("../Modal/Categories-Modal");
+const products = require("../Modal/Products-Modal");
 
 //--------------------------------------------------------------------------------------------
 //------   Add  category , post request ,  /add-category
@@ -72,18 +73,34 @@ const getCategory = async (req, res) => {
 const getSingleCategory = async (req, res) => {
   try {
     const categoryId = req.params.categoryId;
-    const category = await category.findOne({ CategoryId: categoryId });
+    if (!categoryId) {
+      return res.status(400).json({ error: "Category ID is required" });
+    }
 
-    if (category) {
-      res.send(category);
+    const product = await products
+      .find({ CategoryId: categoryId }) // Use find() since you want an array of products
+      .populate("CategoryId", "categoryName") // Populate only categoryName from Category model
+      .exec();
+
+    if (product && product.length > 0) {
+      // Map over the products to include categoryName directly in the product object
+      const allproducts = product.map((prod) => ({
+        ...prod.toObject(),
+        categoryName: prod.CategoryId.categoryName, // Extract categoryName and add it directly
+        CategoryId: prod.CategoryId._id, // Remove the CategoryId object
+      }));
+      res.status(200).json(allproducts);
     } else {
-      res.status(404).send("category not found");
+      res
+        .status(404)
+        .json({ error: "Category not found or no products in this category" });
     }
   } catch (error) {
-    console.log("failed to get category", error);
-    res.send(error);
+    console.error("Internal server error:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
+
 //--------------------------------------------------------------------------------------------
 //------   Edit category , put request ,  /edit-category/:categoryId
 //--------------------------------------------------------------------------------------------
