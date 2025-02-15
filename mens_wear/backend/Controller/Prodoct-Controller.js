@@ -83,7 +83,7 @@ const getProduct = async (req, res) => {
 const getSingleProduct = async (req, res) => {
   try {
     const productId = req.params.productId;
-    const product = await products.findOne({ ProductId: productId });
+    const product = await products.findOne({ _id: productId });
 
     if (product) {
       res.send(product);

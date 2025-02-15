@@ -13,6 +13,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import ProductsOfSingleCategory from './pages/ProductsOfSingleCategory';
+import SingleProductDetail from './pages/SingleProductDetail';
 
 function App() {
   // Access the roleIds from environment variables defined in .env
@@ -34,6 +35,7 @@ function App() {
         <Route path="/admin/allcustomers" element={<ProtectedRoute element={<AllCustomers />} allowedRoles={[adminRoleId]} />} />
         <Route path="/admin/allcart" element={<ProtectedRoute element={<AllCart />} allowedRoles={[adminRoleId]} />} />
         <Route path="/admin/category/:categoryId" element={<ProtectedRoute element={<ProductsOfSingleCategory />} allowedRoles={[adminRoleId]} />} />
+        <Route path="/admin/product/:productId" element={<ProtectedRoute element={<SingleProductDetail />} allowedRoles={[adminRoleId]} />} />
 
         {/* Protected Routes for User (roleId = 3) */}
         <Route path="/user" element={<ProtectedRoute element={<UserDashboard />} allowedRoles={[userRoleId]} />} />

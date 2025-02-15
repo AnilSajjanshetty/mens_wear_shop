@@ -42,6 +42,7 @@ const {
   editCategory,
   getSingleCategory,
   deleteCategory,
+  getCategoryDetails,
 } = require("../Controller/Category-Controller");
 
 //-------------------------------------------------------------------------------------
@@ -91,6 +92,7 @@ router.route("/add-category").post(addCategory);
 router.route("/get-category").get(getCategory);
 router.route("/get-products-by-category/:categoryId").get(getSingleCategory);
 router.route("/edit-category/:categoryId").put(editCategory);
+router.route("/fetch-category/:categoryId").get(getCategoryDetails);
 router.route("/delete-category/:categoryId").delete(deleteCategory);
 
 router.route("/login").post(login);

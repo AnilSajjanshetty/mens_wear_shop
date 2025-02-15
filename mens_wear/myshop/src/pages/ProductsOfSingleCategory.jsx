@@ -7,13 +7,13 @@ import config from '../../config';
 import NavbarComponent from '../components/NavbarComponent';
 
 const ProductsOfSingleCategory = () => {
-    const { categoryId, categoryName } = useParams();
+    const { categoryId } = useParams();
     const navigate = useNavigate();
     const server = config.server;
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const [category, setCategory] = useState(null);
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -27,13 +27,27 @@ const ProductsOfSingleCategory = () => {
         };
         fetchProducts();
     }, [categoryId, server]);
+    useEffect(() => {
+        const fetchCategory = async () => {
+            try {
+                const response = await axios.get(`${server}/fetch-category/${categoryId}`);
+                setCategory(response.data);  // Set the category data
+            } catch (err) {
+                setError('Failed to fetch category details');
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
 
+        fetchCategory();
+    }, [categoryId, server]);
     const handleBack = () => {
         navigate('/admin/allcategory');
     };
 
     const handleViewProduct = (productId) => {
-        navigate(`/product-details/${productId}`);
+        navigate(`/admin/product/${productId}`);
     };
 
     return (
@@ -48,7 +62,7 @@ const ProductsOfSingleCategory = () => {
                     <Button variant="secondary" className="me-2" onClick={handleBack}>
                         ←
                     </Button>
-                    Category / {categoryName}
+                    Category / {category?.categoryName}
                 </h2>
 
                 {loading && <p>Loading products...</p>}
@@ -72,7 +86,7 @@ const ProductsOfSingleCategory = () => {
                                             <strong>Price:</strong> ${product.Price}<br />
                                             <strong>Stock:</strong> {product.Stock}
                                         </Card.Text>
-                                        <Button variant="primary" onClick={() => handleViewProduct(product._id)}>View</Button>
+                                        <Button variant="primary" style={{ width: '100%' }} onClick={() => handleViewProduct(product._id)}>View</Button>
                                     </Card.Body>
                                 </Card>
                             </Col>

@@ -100,6 +100,28 @@ const getSingleCategory = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+//--------------------------------------------------------------------------------------------
+//------  Get single category details - GET /fetch-category/:categoryId
+//--------------------------------------------------------------------------------------------
+const getCategoryDetails = async (req, res) => {
+  try {
+    const categoryId = req.params.categoryId;
+    if (!categoryId) {
+      return res.status(400).json({ error: "Category ID is required" });
+    }
+
+    // Fetch category details
+    const categorys = await category.findOne({ _id: categoryId });
+    if (!categorys) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    res.status(200).json(categorys);
+  } catch (error) {
+    console.error("Internal server error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
 
 //--------------------------------------------------------------------------------------------
 //------   Edit category , put request ,  /edit-category/:categoryId
@@ -177,4 +199,5 @@ module.exports = {
   editCategory,
   getSingleCategory,
   deleteCategory,
+  getCategoryDetails,
 };

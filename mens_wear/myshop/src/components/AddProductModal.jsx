@@ -8,7 +8,17 @@ import config from '../../config';
 const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
     const { register, handleSubmit, reset, setValue } = useForm();
     const [categories, setCategories] = useState([]);
+    // Initialize with an empty array
     const [selectedImages, setSelectedImages] = useState([]);
+
+    // Populate selectedImages when product changes
+    useEffect(() => {
+        if (product?.Image) {
+            setSelectedImages(product.Image);
+        }
+    }, [product]);
+    console.log({ product })
+    console.log({ selectedImages })
     const server = config.server
     useEffect(() => {
         fetchCategories();
@@ -120,10 +130,14 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
                     {/* Display selected images */}
                     <Row>
                         {selectedImages.length > 0 && selectedImages.map((image, index) => (
+
                             <Col key={index} xs={6} md={4} lg={3} className="mb-2">
                                 <div style={{ position: 'relative' }} className='g-0 d-flex align-items-start'>
                                     <Image
-                                        src={URL.createObjectURL(image)}
+                                        src={typeof image === 'string'
+                                            ? `http://localhost:8000/${image}` // Existing image from server
+                                            : URL.createObjectURL(image)      // New image from file input
+                                        }
                                         alt={`Selected Image ${index + 1}`}
                                         style={{ width: '60px', height: '60px', objectFit: 'cover' }}
                                     />
