@@ -134,27 +134,97 @@ const getCart = async (req, res) => {
 //--------------------------------------------------------------------------------------------
 //------  get single carts , get request ,  /get-cart/:cartId
 //--------------------------------------------------------------------------------------------
+// ✅ Fetch a single user's cart
 const getSingleCart = async (req, res) => {
   try {
     const customerId = req.params.userId;
-    const cart = await carts.find({ UserId: customerId });
-    if (cart) {
-      res.send(cart);
+    console.log({ customerId });
+
+    // Fetch cart with product details
+    const cart = await carts.find({ UserId: customerId }).populate("ProductId");
+
+    console.log({ cart });
+
+    if (cart.length > 0) {
+      // Extract only product details
+      const products = cart.map((item) => ({
+        ProductId: item.ProductId.ProductId,
+        ProductName: item.ProductId.ProductName,
+        Description: item.ProductId.Description,
+        Price: item.ProductId.Price,
+        Rating: item.ProductId.Rating,
+        Stock: item.ProductId.Stock,
+        CategoryId: item.ProductId.CategoryId,
+        Images: item.ProductId.Image, // Array of images
+        Quantity: item.Quantity,
+        OrderStatus: item.OrderStatus,
+        DeliveryStatus: item.DeliveryStatus,
+        PaymentMethod: item.PaymentMethod,
+        PaymentStatus: item.PaymentStatus,
+        TransactionId: item.TransactionId,
+        CartId: item.CartId,
+      }));
+
+      res.send(products);
     } else {
-      res.status(404).send("cart not found");
+      res.status(404).send("Cart not found");
     }
   } catch (error) {
-    console.log("failed to get cart", error);
-    res.send(error);
+    console.error("Failed to get cart", error);
+    res.status(500).send(error);
   }
 };
+
+// ✅ Confirm Order API
+const confirmOrder = async (req, res) => {
+  try {
+    const { cartId } = req.params;
+    const { PaymentMethod, TransactionId } = req.body;
+
+    // Validate Payment Method
+    if (!PaymentMethod) {
+      return res.status(400).send("Payment method is required.");
+    }
+
+    // Ensure TransactionId is provided unless it's Cash on Delivery
+    if (PaymentMethod !== "Cash on Delivery" && !TransactionId) {
+      return res
+        .status(400)
+        .send("Transaction ID is required for non-COD payments.");
+    }
+
+    // Determine PaymentStatus based on PaymentMethod
+    const paymentStatus =
+      PaymentMethod === "Cash on Delivery" ? "Pending" : "Paid";
+
+    const updatedCart = await carts.findOneAndUpdate(
+      { CartId: cartId },
+      {
+        OrderStatus: "Confirmed",
+        PaymentStatus: paymentStatus, // Set based on payment method
+        PaymentMethod,
+        TransactionId: TransactionId || null, // Null if not provided
+      },
+      { new: true } // Returns the updated document
+    );
+
+    if (updatedCart) {
+      res.send(updatedCart);
+    } else {
+      res.status(404).send("Cart item not found");
+    }
+  } catch (error) {
+    console.error("Error confirming order", error);
+    res.status(500).send(error);
+  }
+};
+
 //--------------------------------------------------------------------------------------------
 //------   Edit cart , put request ,  /edit-cart/:cartId
 //--------------------------------------------------------------------------------------------
 const editCart = async (req, res) => {
   try {
     const CartId = req.params.cartId;
-    console.log({ CartId });
     const {
       Quantity,
       OrderStatus,
@@ -219,4 +289,11 @@ const deleteCart = async (req, res) => {
   }
 };
 
-module.exports = { addCart, getCart, editCart, getSingleCart, deleteCart };
+module.exports = {
+  addCart,
+  getCart,
+  editCart,
+  getSingleCart,
+  deleteCart,
+  confirmOrder,
+};

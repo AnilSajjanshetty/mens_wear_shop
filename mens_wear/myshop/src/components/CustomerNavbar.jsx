@@ -52,6 +52,8 @@ const CustomerNavbar = () => {
                         <Nav className="me-auto">
                             <Nav.Link href="/user/products" className="text-white fw-semibold">
                                 Products
+                            </Nav.Link>  <Nav.Link href="/user/allcategory" className="text-white fw-semibold">
+                                Categories
                             </Nav.Link>
                             <Nav.Link href="/user/mycart" className="text-white fw-semibold">
                                 My Cart

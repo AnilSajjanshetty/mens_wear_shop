@@ -4,6 +4,7 @@ import CustomerNavbar from "../components/CustomerNavbar";
 import { motion } from "framer-motion";
 import axios from "axios";
 import config from "../../config";
+import { useNavigate } from "react-router-dom";
 
 const MyProducts = () => {
     const [products, setProducts] = useState([]);
@@ -28,8 +29,10 @@ const MyProducts = () => {
     const navbarVariants = {
         hidden: { opacity: 0, y: -50 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
+    }; const navigate = useNavigate()
+    const handleViewProduct = (productId) => {
+        navigate(`/user/product/${productId}`);
     };
-
     return (
         <motion.div
             initial="hidden"
@@ -73,7 +76,7 @@ const MyProducts = () => {
                                             <Card.Text>${product.Price}</Card.Text>
                                             <Card.Text>{product.Description}</Card.Text>
                                             <Card.Text>{product.Rating}</Card.Text>
-                                            <Button variant="primary" size="xl" style={{ width: '100%' }}>View</Button>
+                                            <Button variant="primary" size="xl" style={{ width: '100%' }} onClick={() => handleViewProduct(product._id)}>View</Button>
                                         </Card.Body>
                                     </Card>
 

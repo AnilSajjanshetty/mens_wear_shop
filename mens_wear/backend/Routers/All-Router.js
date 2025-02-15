@@ -27,6 +27,7 @@ const {
   editCart,
   getSingleCart,
   deleteCart,
+  confirmOrder,
 } = require("../Controller/Cart-Controller");
 const {
   addVendor,
@@ -69,9 +70,10 @@ router.route("/delete-product/:productId").delete(deleteProduct);
 //-------------------------------------------------------------------------------------
 router.route("/add-cart").post(addCart);
 router.route("/get-cart").get(getCart);
-router.route("/get-cart/:customerId").get(getSingleCart);
+router.route("/get-cart/:userId").get(getSingleCart);
 router.route("/edit-cart/:cartId").put(editCart);
 router.route("/delete-cart/:cartId").delete(deleteCart);
+router.route("/confirm-cart/:cartId").put(confirmOrder);
 
 //-------------------------------------------------------------------------------------
 //--------- Vendor Routes

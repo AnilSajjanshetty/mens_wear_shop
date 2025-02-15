@@ -14,6 +14,10 @@ import RegisterPage from './pages/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import ProductsOfSingleCategory from './pages/ProductsOfSingleCategory';
 import SingleProductDetail from './pages/SingleProductDetail';
+import UserAllProducts from './pages/UserAllProducts';
+import UserAllCategory from './pages/UserCategory';
+import UserSingleCategory from './pages/UserSingleCategory';
+import UserProductDetails from './pages/UserProductDetails';
 
 function App() {
   // Access the roleIds from environment variables defined in .env
@@ -28,7 +32,6 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* Protected Routes for Admin (roleId = 1) */}
         <Route path="/admin" element={<ProtectedRoute element={<AdminDashboard />} allowedRoles={[adminRoleId]} />} />
         <Route path="/admin/allproducts" element={<ProtectedRoute element={<AllProducts />} allowedRoles={[adminRoleId]} />} />
         <Route path="/admin/allcategory" element={<ProtectedRoute element={<AllCategory />} allowedRoles={[adminRoleId]} />} />
@@ -37,10 +40,13 @@ function App() {
         <Route path="/admin/category/:categoryId" element={<ProtectedRoute element={<ProductsOfSingleCategory />} allowedRoles={[adminRoleId]} />} />
         <Route path="/admin/product/:productId" element={<ProtectedRoute element={<SingleProductDetail />} allowedRoles={[adminRoleId]} />} />
 
-        {/* Protected Routes for User (roleId = 3) */}
         <Route path="/user" element={<ProtectedRoute element={<UserDashboard />} allowedRoles={[userRoleId]} />} />
         <Route path="/user/products" element={<ProtectedRoute element={<MyProducts />} allowedRoles={[userRoleId]} />} />
         <Route path="/user/mycart" element={<ProtectedRoute element={<MyCart />} allowedRoles={[userRoleId]} />} />
+        <Route path="/user/allproduct" element={<ProtectedRoute element={<UserAllProducts />} allowedRoles={[userRoleId]} />} />
+        <Route path="/user/allcategory" element={<ProtectedRoute element={<UserAllCategory />} allowedRoles={[userRoleId]} />} />
+        <Route path="/user/product/:productId" element={<ProtectedRoute element={<UserProductDetails />} allowedRoles={[userRoleId]} />} />
+        <Route path="/user/category/:categoryId" element={<ProtectedRoute element={<UserSingleCategory />} allowedRoles={[userRoleId]} />} />
       </Routes>
     </Router>
   );

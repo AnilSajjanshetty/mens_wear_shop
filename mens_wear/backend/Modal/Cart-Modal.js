@@ -32,7 +32,7 @@ const cartSchema = new mongoose.Schema(
         "Shipped",
         "Out for Delivery",
         "Delivered",
-        "Canceled",
+        "Cancelled",
       ],
       default: "Not Shipped",
     },

@@ -4,11 +4,11 @@ import axios from "axios";
 import { Button, Container, Form } from "react-bootstrap";
 import { motion } from "framer-motion";
 import config from "../../config";
-import NavbarComponent from "../components/NavbarComponent";
+import CustomerNavbar from "../components/CustomerNavbar";
 import "./SingleProductsDetail.css"; // Ensure correct path
 import { FiPlus, FiMinus } from "react-icons/fi";
 
-const SingleProductDetail = () => {
+const UserProductDetails = () => {
     const { productId } = useParams();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -18,8 +18,7 @@ const SingleProductDetail = () => {
     const [quantity, setQuantity] = useState(1); // Order quantity state
     const server = config.server;
     const navigate = useNavigate();
-    const role = localStorage.getItem('roleId');
-    const userRoleId = Number(import.meta.env.VITE_USER_ROLE_ID); // 3
+
 
     useEffect(() => {
         const fetchProductDetails = async () => {
@@ -88,7 +87,7 @@ const SingleProductDetail = () => {
                 padding: "1.25rem",
             }}
         >
-            <NavbarComponent />
+            <CustomerNavbar />
             <Container>
                 <Button variant="secondary" className="me-2" onClick={handleBack}>
                     ← Back
@@ -128,7 +127,7 @@ const SingleProductDetail = () => {
                         <p className="product-stock">{product.Stock} in stock</p>
 
                         {/* Quantity Selector with Plus & Minus Icons */}
-                        {userRoleId == role && <Form.Group controlId="quantity">
+                        <Form.Group controlId="quantity">
                             <Form.Label>Quantity:</Form.Label>
                             <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                                 <Button
@@ -153,16 +152,16 @@ const SingleProductDetail = () => {
                                     <FiPlus />
                                 </Button>
                             </span>
-                        </Form.Group>}
+                        </Form.Group>
 
-                        {userRoleId == role && <Button
+                        <Button
                             variant="primary"
                             className="add-to-cart mt-3"
                             onClick={addToCart}
                             disabled={addingToCart} // Disable button while adding
                         >
                             {addingToCart ? "Adding..." : "Add to Cart"}
-                        </Button>}
+                        </Button>
                     </div>
                 </div>
             </Container>
@@ -170,4 +169,4 @@ const SingleProductDetail = () => {
     );
 };
 
-export default SingleProductDetail;
+export default UserProductDetails;
