@@ -4,8 +4,7 @@ const AutoIncrement = require("mongoose-sequence")(mongoose);
 const cartSchema = new mongoose.Schema(
   {
     UserId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "profile",
+      type: Number, // TODO add ref for  profile use _id
       required: true,
     },
     ProductId: {
@@ -13,7 +12,11 @@ const cartSchema = new mongoose.Schema(
       ref: "product",
       required: true,
     },
-
+    Quantity: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
     // ✅ Order Status
     OrderStatus: {
       type: String,
@@ -24,7 +27,13 @@ const cartSchema = new mongoose.Schema(
     // ✅ Delivery Status
     DeliveryStatus: {
       type: String,
-      enum: ["Not Shipped", "Shipped", "Out for Delivery", "Delivered"],
+      enum: [
+        "Not Shipped",
+        "Shipped",
+        "Out for Delivery",
+        "Delivered",
+        "Canceled",
+      ],
       default: "Not Shipped",
     },
 
