@@ -4,6 +4,7 @@ import { Navbar, Nav, Container } from "react-bootstrap";
 import { motion } from "framer-motion";
 import '../components/NavbarComponent.css';
 import CustomerNavbar from "../components/CustomerNavbar";
+import MainFooter from "../components/MainFooter";
 
 const UserDashboard = () => {
   const navigate = useNavigate(); // Hook for navigation
@@ -89,6 +90,7 @@ const UserDashboard = () => {
           Browse products, add items to your cart, and enjoy shopping!
         </p>
       </Container>
+      <MainFooter />
     </motion.div>
   );
 };
