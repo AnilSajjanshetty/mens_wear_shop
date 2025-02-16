@@ -109,7 +109,7 @@ router.route("/delete-category/:categoryId").delete(deleteCategory);
 router.route("/get-feedback/:usrId").get(getFeedbackByUser);
 router.route("/add-feedback").post(submitOrUpdateFeedback);
 router.route("/update-feedback").put(submitOrUpdateFeedback);
-router.route("/all-feedback").get(getAllFeedback);
+router.route("/all-feedbacks").get(getAllFeedback);
 
 // Contact Routes
 router.route("/add-contact").post(submitContactMessage);

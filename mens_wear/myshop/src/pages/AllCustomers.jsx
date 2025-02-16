@@ -35,7 +35,7 @@ const AllCustomers = () => {
         >
             <NavbarComponent />
             <Container>
-                <h2 className="text-center mb-4">Manage Customers</h2>
+                <h2 className="text-center mb-4 text-white"> Customers list</h2>
                 <Row>
                     {customers.length > 0 ? (
                         customers.map((customer) => (

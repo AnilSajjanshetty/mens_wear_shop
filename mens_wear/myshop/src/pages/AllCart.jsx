@@ -66,7 +66,7 @@ const AllCart = () => {
 
             <NavbarComponent />
             <Container>
-                <h2 className="text-center text-dark mb-4">Manage Orders</h2>
+                <h2 className="text-center text-white mb-4">Orders list</h2>
 
                 <Row className="d-flex flex-wrap justify-content-center">
                     {cartItems.length > 0 ? (

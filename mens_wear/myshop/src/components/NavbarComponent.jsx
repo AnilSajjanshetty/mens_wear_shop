@@ -52,10 +52,12 @@ const NavbarComponent = () => {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
-                        <Nav.Link href="/admin/allproducts">All Products</Nav.Link>
-                        <Nav.Link href="/admin/allcategory">All Categories</Nav.Link>
-                        <Nav.Link href="/admin/allcustomers">All Customers</Nav.Link>
-                        <Nav.Link href="/admin/allcart">All Carts</Nav.Link>
+                        <Nav.Link href="/admin/allproducts">Products</Nav.Link>
+                        <Nav.Link href="/admin/allcategory">Categories</Nav.Link>
+                        <Nav.Link href="/admin/allcustomers">Customers</Nav.Link>
+                        <Nav.Link href="/admin/allcart">Orders</Nav.Link>
+                        <Nav.Link href="/admin/allenquiry">Enquires</Nav.Link>
+                        <Nav.Link href="/admin/allfeedback">Feedbacks</Nav.Link>
                     </Nav>
                     <motion.button
                         className="btn btn-primary me-2"
