@@ -53,7 +53,11 @@ const UserDashboard = () => {
       initial="hidden"
       animate="visible"
       variants={navbarVariants}
-      style={{ minHeight: "100vh", background: "linear-gradient(135deg, #ff512f, #dd2476)", padding: "1.25rem" }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh", background: "linear-gradient(135deg, #ff512f, #dd2476)", padding: "1.25rem"
+      }}
     >
       <CustomerNavbar />
       {/* <Navbar bg="dark" expand="lg" className="custom-navbar py-3 shadow">
@@ -84,7 +88,7 @@ const UserDashboard = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar> */}
-      <Container className="text-white mt-5">
+      <Container className="text-white mt-5 flex-grow-1" >
         <h1 className="text-center">Welcome to the User Dashboard</h1>
         <p className="text-center mt-3">
           Browse products, add items to your cart, and enjoy shopping!

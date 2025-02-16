@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ContactModal from './ContactModal';
+import ContactModal from "./ContactModal";
 
 const Footer = () => {
   const [showContactModal, setShowContactModal] = useState(false);
@@ -19,28 +19,23 @@ const Footer = () => {
             <div className="col-md-6">
               <h6>Office Address</h6>
               <p>Pune, Maharashtra</p>
+
             </div>
             <div className="col-md-6">
               <h6>Shop Address</h6>
               <p>Ahmedpur, Latur, Maharashtra</p>
+              <button className="btn btn-dark" onClick={openContactModal}>
+                Contact Us
+              </button>
             </div>
           </div>
           <div className="mt-3">
-            <a
-              href="#"
-              className="text-decoration-none text-white"
-              onClick={(e) => {
-                e.preventDefault();
-                openContactModal();
-              }}
-            >
-              Contact Us
-            </a>
+
           </div>
         </div>
       </footer>
 
-      {/* Contact Modal */}
+      {/* Render the ContactModal only if showContactModal is true */}
       {showContactModal && <ContactModal closeModal={closeContactModal} />}
     </>
   );
