@@ -22,6 +22,11 @@ const fileFilter = (req, file, cb) => {
     cb(new Error("Only image files are allowed!"), false);
   }
 };
+// Multer configuration for single file upload (Profile Picture)
+const uploadSingle = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+}).single("Image"); // Use 'Image' as the field name for single uploads
 
 // Configure multer for multiple image uploads (up to 5 images)
 const upload = multer({
@@ -29,4 +34,4 @@ const upload = multer({
   fileFilter: fileFilter,
 }).array("Image", 5); // Change '5' to the max number of images you allow
 
-module.exports = upload;
+module.exports = { uploadSingle, upload };

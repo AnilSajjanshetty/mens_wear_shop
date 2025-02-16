@@ -63,7 +63,7 @@ const CustomerNavbar = () => {
                             className="btn btn-primary me-2"
                             variants={buttonVariants}
                             whileHover="hover"
-                            onClick={() => alert("Navigating to Profile...")}
+                            onClick={() => navigate("/user/profile")}
                         >
                             Profile
                         </motion.button>

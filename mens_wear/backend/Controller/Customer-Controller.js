@@ -1,6 +1,9 @@
 require("../DataBase/DbConnection");
 const users = require("../Modal/User-Modal");
 const userRole = require("../Modal/Users-Role-Modal");
+const { uploadSingle } = require("../Config/MulterConfig");
+const multer = require("multer");
+
 //--------------------------------------------------------------------------------------------
 //------   Home , get request ,  /
 //--------------------------------------------------------------------------------------------
@@ -66,7 +69,7 @@ const getAllCustomer = async (req, res) => {
 const getSingleCustomer = async (req, res) => {
   try {
     const customerId = req.params.customerId;
-    const Customer = await users.findOne({ CustomerId: customerId });
+    const Customer = await users.findOne({ UserId: customerId });
 
     if (Customer) {
       res.send(Customer);
@@ -82,24 +85,43 @@ const getSingleCustomer = async (req, res) => {
 //------   Edit Customer , put request ,  /Edit-customer
 //--------------------------------------------------------------------------------------------
 const editCustomer = async (req, res) => {
-  try {
-    const updateCustomer = {
-      UserName: req.body.UserName,
-      Email: req.body.Email,
-      Password: req.body.Password,
-      MobileNo: req.body.MobileNo,
-      Address: req.body.Address,
-    };
-    const updateCustomers = await users.updateOne(
-      { CustomerId: req.params.customerId },
-      { $set: updateCustomer }
-    );
+  uploadSingle(req, res, async (err) => {
+    try {
+      if (err instanceof multer.MulterError) {
+        return res.status(400).json({ error: "Multer Error: " + err.message });
+      } else if (err) {
+        return res.status(400).json({ error: err.message });
+      }
 
-    res.send(updateCustomer);
-  } catch (error) {
-    console.log("Update failed", error);
-    res.send(error);
-  }
+      const customerId = req.params.customerId;
+      const user = await users.findOne({ UserId: customerId });
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Update user fields
+      user.userName = req.body.userName || user.userName;
+      user.Email = req.body.Email || user.Email;
+      user.MobileNo = req.body.MobileNo || user.MobileNo;
+      user.Address = req.body.Address || user.Address;
+
+      // Update profile picture if provided
+      // Update profile picture if provided
+      console.log("Uploaded file:", req.file);
+      if (req.file) {
+        user.Image = `UploadedFiles/${req.file.filename}`;
+      } else {
+        console.log("No image file received!");
+      }
+
+      await user.save();
+      res.status(200).json(user);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ error: "Failed to update profile" });
+    }
+  });
 };
 
 //------------------------------------------------------------------------------------

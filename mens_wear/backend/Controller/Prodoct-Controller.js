@@ -1,7 +1,7 @@
 const multer = require("multer");
 require("../DataBase/DbConnection");
 const products = require("../Modal/Products-Modal");
-const upload = require("../Config/MulterConfig");
+const { upload } = require("../Config/MulterConfig");
 
 //--------------------------------------------------------------------------------------------
 //------   Add  productt , post request ,  /add-product

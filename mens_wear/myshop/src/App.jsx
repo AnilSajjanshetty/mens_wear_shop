@@ -20,6 +20,8 @@ import UserSingleCategory from './pages/UserSingleCategory';
 import UserProductDetails from './pages/UserProductDetails';
 import FeedbackListPage from './pages/FeedbackListPage';
 import ContactListPage from './pages/ContactListPage';
+import AdminProfilePage from './pages/AdminProfilePage';
+import UserProfilePage from './pages/UserProfilePage';
 
 function App() {
   // Access the roleIds from environment variables defined in .env
@@ -43,9 +45,11 @@ function App() {
         <Route path="/admin/product/:productId" element={<ProtectedRoute element={<SingleProductDetail />} allowedRoles={[adminRoleId]} />} />
         <Route path="/admin/allenquiry" element={<ProtectedRoute element={<ContactListPage />} allowedRoles={[adminRoleId]} />} />
         <Route path="/admin/allfeedback" element={<ProtectedRoute element={<FeedbackListPage />} allowedRoles={[adminRoleId]} />} />
+        <Route path="/admin/profile" element={<ProtectedRoute element={<AdminProfilePage />} allowedRoles={[adminRoleId]} />} />
 
         <Route path="/user" element={<ProtectedRoute element={<UserDashboard />} allowedRoles={[userRoleId]} />} />
         <Route path="/user/products" element={<ProtectedRoute element={<MyProducts />} allowedRoles={[userRoleId]} />} />
+        <Route path="/user/profile" element={<ProtectedRoute element={<UserProfilePage />} allowedRoles={[userRoleId]} />} />
         <Route path="/user/mycart" element={<ProtectedRoute element={<MyCart />} allowedRoles={[userRoleId]} />} />
         <Route path="/user/allproduct" element={<ProtectedRoute element={<UserAllProducts />} allowedRoles={[userRoleId]} />} />
         <Route path="/user/allcategory" element={<ProtectedRoute element={<UserAllCategory />} allowedRoles={[userRoleId]} />} />

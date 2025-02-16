@@ -29,6 +29,10 @@ const profileSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  Image: {
+    type: String, // Store image URL, default to null
+    default: null,
+  },
 });
 
 // Apply auto-increment plugin for UserId
