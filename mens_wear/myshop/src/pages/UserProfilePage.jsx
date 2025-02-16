@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import config from "../../config";
 import { FaUserCircle } from "react-icons/fa"; // Default profile icon
+import { FiUpload } from "react-icons/fi"; // Upload icon
 import CustomerNavbar from "../components/CustomerNavbar";
 
 const UserProfilePage = () => {
@@ -76,38 +77,54 @@ const UserProfilePage = () => {
             transition={{ duration: 0.8 }}
             style={{
                 minHeight: "100vh",
-                background: "linear-gradient(135deg, #ff512f, #dd2476)",
+                background: "linear-gradient(135deg, #1e3c72, #2a5298)",
                 padding: "1.25rem",
             }}
         >
             <CustomerNavbar />
-            <Container className="text-black mt-5">
-                <Row className="justify-content-center mt-5">
-                    <Col md={6}>
+            <Container className="text-white mt-5">
+                <Row className="justify-content-center">
+                    <Col md={8} lg={6}>
                         {error && <Alert variant="danger">{error}</Alert>}
                         {userProfile ? (
-                            <Card className="shadow-sm text-center p-4">
+                            <Card className="shadow-lg p-4 text-center rounded-4 border-0" style={{ background: "#fff", color: "#333" }}>
                                 {/* Profile Image */}
-                                {userProfile.Image ? (
-                                    <img
-                                        src={`http://localhost:8000/${userProfile.Image}`}
-                                        alt="Profile"
-                                        className="rounded-circle mb-3"
-                                        style={{ width: "120px", height: "120px", objectFit: "cover" }}
-                                    />
-                                ) : (
-                                    <FaUserCircle size={120} className="text-muted mb-3" />
-                                )}
+                                <div className="position-relative mx-auto mb-3" style={{ width: "140px", height: "140px" }}>
+                                    {userProfile.Image ? (
+                                        <motion.img
+                                            src={`http://localhost:8000/${userProfile.Image}`}
+                                            alt="Profile"
+                                            className="rounded-circle border border-2 shadow"
+                                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                            whileHover={{ scale: 1.1 }}
+                                        />
+                                    ) : (
+                                        <FaUserCircle size={140} className="text-muted" />
+                                    )}
+                                </div>
 
                                 <Card.Body>
                                     {editing ? (
                                         <>
                                             <Form.Group className="mb-3">
-                                                <Form.Label>Profile Picture</Form.Label>
-                                                <Form.Control type="file" accept="image/*" onChange={handleFileChange} />
+                                                <Form.Label className="fw-bold">Profile Picture</Form.Label>
+                                                <div className="d-flex align-items-center justify-content-center border rounded p-2">
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={handleFileChange}
+                                                        className="d-none"
+                                                        id="fileUpload"
+                                                    />
+                                                    <label htmlFor="fileUpload" className="btn btn-outline-primary d-flex align-items-center">
+                                                        <FiUpload className="me-2" /> Upload Image
+                                                    </label>
+                                                    {selectedFile && <span className="ms-2">{selectedFile.name}</span>}
+                                                </div>
                                             </Form.Group>
+
                                             <Form.Group className="mb-3">
-                                                <Form.Label>Name</Form.Label>
+                                                <Form.Label className="fw-bold">Name</Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     name="userName"
@@ -115,8 +132,9 @@ const UserProfilePage = () => {
                                                     onChange={handleInputChange}
                                                 />
                                             </Form.Group>
+
                                             <Form.Group className="mb-3">
-                                                <Form.Label>Email</Form.Label>
+                                                <Form.Label className="fw-bold">Email</Form.Label>
                                                 <Form.Control
                                                     type="email"
                                                     name="Email"
@@ -124,8 +142,9 @@ const UserProfilePage = () => {
                                                     onChange={handleInputChange}
                                                 />
                                             </Form.Group>
+
                                             <Form.Group className="mb-3">
-                                                <Form.Label>Mobile Number</Form.Label>
+                                                <Form.Label className="fw-bold">Mobile Number</Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     name="MobileNo"
@@ -133,8 +152,9 @@ const UserProfilePage = () => {
                                                     onChange={handleInputChange}
                                                 />
                                             </Form.Group>
+
                                             <Form.Group className="mb-3">
-                                                <Form.Label>Address</Form.Label>
+                                                <Form.Label className="fw-bold">Address</Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     name="Address"
@@ -142,28 +162,36 @@ const UserProfilePage = () => {
                                                     onChange={handleInputChange}
                                                 />
                                             </Form.Group>
+
                                             <Button variant="success" onClick={handleUpdateProfile} disabled={loading}>
                                                 {loading ? "Updating..." : "Save Changes"}
                                             </Button>
-                                            <Button variant="secondary" className="ms-2" onClick={() => setEditing(false)}>
+                                            <Button variant="outline-secondary" className="ms-2" onClick={() => setEditing(false)}>
                                                 Cancel
                                             </Button>
                                         </>
                                     ) : (
                                         <>
-                                            <Card.Title>{userProfile.userName}</Card.Title>
-                                            <Card.Subtitle className="mb-2 text-muted">{userProfile.Email}</Card.Subtitle>
-                                            <Card.Text>
-                                                <strong>Mobile:</strong> {userProfile.MobileNo} <br />
-                                                <strong>Address:</strong> {userProfile.Address}
+                                            <Card.Title className="fw-bold fs-4">{userProfile.userName}</Card.Title>
+                                            <Card.Subtitle className="mb-3 text-muted">{userProfile.Email}</Card.Subtitle>
+                                            <Card.Text className="fw-medium">
+                                                <strong>📞 Mobile:</strong> {userProfile.MobileNo} <br />
+                                                <strong>🏠 Address:</strong> {userProfile.Address}
                                             </Card.Text>
-                                            <Button variant="warning" onClick={() => setEditing(true)}>Edit Profile</Button>
+                                            <motion.button
+                                                className="btn btn-warning"
+                                                onClick={() => setEditing(true)}
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                            >
+                                                Edit Profile
+                                            </motion.button>
                                         </>
                                     )}
                                 </Card.Body>
                             </Card>
                         ) : (
-                            <p className="text-center">Loading profile...</p>
+                            <p className="text-center fs-5">Loading profile...</p>
                         )}
                     </Col>
                 </Row>
