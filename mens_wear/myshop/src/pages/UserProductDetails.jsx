@@ -4,9 +4,8 @@ import axios from "axios";
 import { Button, Container, Form } from "react-bootstrap";
 import { motion } from "framer-motion";
 import config from "../../config";
-import CustomerNavbar from "../components/CustomerNavbar";
-import "./SingleProductsDetail.css"; // Ensure correct path
 import { FiPlus, FiMinus } from "react-icons/fi";
+import CustomerNavbar from "../components/CustomerNavbar";
 
 const UserProductDetails = () => {
     const { productId } = useParams();
@@ -15,17 +14,18 @@ const UserProductDetails = () => {
     const [error, setError] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
     const [addingToCart, setAddingToCart] = useState(false);
-    const [quantity, setQuantity] = useState(1); // Order quantity state
+    const [quantity, setQuantity] = useState(1);
     const server = config.server;
     const navigate = useNavigate();
-
+    const role = localStorage.getItem('roleId');
+    const userRoleId = Number(import.meta.env.VITE_USER_ROLE_ID);
 
     useEffect(() => {
         const fetchProductDetails = async () => {
             try {
                 const response = await axios.get(`${server}/get-product/${productId}`);
                 setProduct(response.data);
-                setSelectedImage(response.data.Image[0]); // Set first image as default
+                setSelectedImage(response.data.Image[0]);
             } catch (err) {
                 setError("Failed to fetch product details");
             } finally {
@@ -53,14 +53,14 @@ const UserProductDetails = () => {
         setAddingToCart(true);
 
         try {
-            const userId = Number(localStorage.getItem("userId")); // Replace with actual logged-in user ID
-            const response = await axios.post(`${server}/add-cart`, {
+            const userId = Number(localStorage.getItem("userId"));
+            await axios.post(`${server}/add-cart`, {
                 UserId: userId,
                 ProductId: product._id,
-                Quantity: quantity,  // Include quantity
+                Quantity: quantity,
                 OrderStatus: "Pending",
                 DeliveryStatus: "Not Shipped",
-                PaymentMethod: null, // Since order is not confirmed yet
+                PaymentMethod: null,
                 PaymentStatus: "Pending",
             });
 
@@ -81,87 +81,82 @@ const UserProductDetails = () => {
         <motion.div
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0, transition: { duration: 0.8 } }}
-            style={{
-
-                background: "linear-gradient(135deg, #ff512f, #dd2476)",
-                padding: "1.25rem",
-            }}
+            style={{ background: "linear-gradient(135deg, #ff512f, #dd2476)", padding: "1.25rem" }}
         >
             <CustomerNavbar />
             <Container>
-                <Button variant="secondary" className="me-2" onClick={handleBack}>
+                <Button variant="secondary" className="mb-3" onClick={handleBack}>
                     ← Back
                 </Button>
-                <div className="single-product-container mt-4 " >
-                    {/* Image Section */}
-                    <div className="product-images">
-                        {/* Small Thumbnails */}
-                        <div className="image-gallery">
-                            {product.Image &&
-                                product.Image.map((image, index) => (
-                                    <img
-                                        key={index}
-                                        src={`http://localhost:8000/${image}`}
-                                        alt={`Product image ${index + 1}`}
-                                        className="product-thumbnail"
-                                        onClick={() => setSelectedImage(image)}
-                                    />
-                                ))}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "2rem" }}>
+                    {/* Left Side: Images */}
+                    <div style={{ flex: "1", maxWidth: "500px" }}>
+                        <img
+                            src={`http://localhost:8000/${selectedImage}`}
+                            alt="Product"
+                            style={{ width: "100%", borderRadius: "10px", boxShadow: "0 4px 8px rgba(0,0,0,0.2)" }}
+                        />
+                        <div style={{ display: "flex", justifyContent: "center", marginTop: "10px", gap: "10px" }}>
+                            {product.Image && product.Image.map((image, index) => (
+                                <img
+                                    key={index}
+                                    src={`http://localhost:8000/${image}`}
+                                    alt="Thumbnail"
+                                    style={{ width: "60px", height: "60px", cursor: "pointer", border: selectedImage === image ? "2px solid #ff512f" : "none" }}
+                                    onClick={() => setSelectedImage(image)}
+                                />
+                            ))}
                         </div>
                     </div>
 
-                    {/* Product Details */}
-                    <div className="product-details">
-                        {/* Large Main Image */}
-                        <div className="main-image-container">
-                            <img
-                                src={`http://localhost:8000/${selectedImage}`}
-                                alt="Selected Product"
-                                className="img-fluid main-product-image "
-                            />
-                        </div>
-                        <h2 className="product-name">{product.productName}</h2>
-                        <p className="product-description">{product.Description}</p>
-                        <p className="product-price">${product.Price}</p>
-                        <p className="product-category">{product.categoryName}</p>
-                        <p className="product-stock">{product.Stock} in stock</p>
+                    {/* Right Side: Product Details */}
+                    <div style={{ flex: "1", minWidth: "300px" }}>
+                        <h2 style={{ color: "white" }}>{product.productName}</h2>
+                        <p style={{ fontSize: "1.2rem", color: "white" }}>{product.Description}</p>
+                        <h3 style={{ color: "white" }}>${product.Price}</h3>
+                        <p style={{ color: "white" }}>Category: {product.categoryName}</p>
+                        <p style={{ color: "white" }}>{product.Stock} in stock</p>
 
-                        {/* Quantity Selector with Plus & Minus Icons */}
-                        <Form.Group controlId="quantity">
-                            <Form.Label>Quantity:</Form.Label>
-                            <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        {userRoleId == role && (
+                            <div>
+                                <Form.Group controlId="quantity">
+                                    <Form.Label style={{ color: "white" }}>Quantity:</Form.Label>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                        <Button
+                                            variant="light"
+                                            onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                                            disabled={quantity === 1}
+                                            style={{ border: "1px solid #ccc", borderRadius: "5px", padding: "5px 10px" }}
+                                        >
+                                            <FiMinus />
+                                        </Button>
+
+                                        <span style={{ fontSize: "1.2rem", fontWeight: "bold", minWidth: "40px", textAlign: "center", color: "white" }}>
+                                            {quantity}
+                                        </span>
+
+                                        <Button
+                                            variant="light"
+                                            onClick={() => setQuantity((prev) => Math.min(product.Stock, prev + 1))}
+                                            disabled={quantity >= product.Stock}
+                                            style={{ border: "1px solid #ccc", borderRadius: "5px", padding: "5px 10px" }}
+                                        >
+                                            <FiPlus />
+                                        </Button>
+                                    </div>
+                                </Form.Group>
+
                                 <Button
-                                    variant="light"
-                                    onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                                    disabled={quantity === 1}
-                                    style={{ border: "1px solid #ccc", borderRadius: "5px", padding: "5px 10px" }}
+                                    variant="warning"
+                                    className="mt-3"
+                                    onClick={addToCart}
+                                    disabled={addingToCart}
+                                    style={{ width: "100%", padding: "10px", fontSize: "1.2rem" }}
                                 >
-                                    <FiMinus />
+                                    {addingToCart ? "Adding..." : "Add to Cart"}
                                 </Button>
-
-                                <span style={{ fontSize: "1.2rem", fontWeight: "bold", minWidth: "40px", textAlign: "center" }}>
-                                    {quantity}
-                                </span>
-
-                                <Button
-                                    variant="light"
-                                    onClick={() => setQuantity((prev) => Math.min(product.Stock, prev + 1))}
-                                    disabled={quantity >= product.Stock}
-                                    style={{ border: "1px solid #ccc", borderRadius: "5px", padding: "5px 10px" }}
-                                >
-                                    <FiPlus />
-                                </Button>
-                            </span>
-                        </Form.Group>
-
-                        <Button
-                            variant="primary"
-                            className="add-to-cart mt-3"
-                            onClick={addToCart}
-                            disabled={addingToCart} // Disable button while adding
-                        >
-                            {addingToCart ? "Adding..." : "Add to Cart"}
-                        </Button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </Container>
