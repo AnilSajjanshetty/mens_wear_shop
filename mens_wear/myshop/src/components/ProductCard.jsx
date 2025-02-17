@@ -2,6 +2,9 @@ import React from "react";
 import { motion } from "framer-motion";
 
 const ProductCard = ({ product }) => {
+  const defaultImage = "https://via.placeholder.com/200"; // Placeholder image if no image exists
+  const productImage = product?.Image?.length > 0 ? product.Image[0] : defaultImage; // First image or default
+
   return (
     <motion.div
       className="card shadow-lg border rounded-lg w-100"
@@ -9,7 +12,7 @@ const ProductCard = ({ product }) => {
     >
       <div className="overflow-hidden mx-auto" style={{ height: "18rem" }}>
         <img
-          src={product?.Image} // Fetch first image from array
+          src={`http://localhost:8000/${productImage}`}
           alt={product.ProductName}
           className="img-fluid"
         />

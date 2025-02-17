@@ -30,6 +30,7 @@ const {
   getSingleProduct,
   deleteProduct,
   getAllProductsGroupedByCategory,
+  getFeaturedProduct,
 } = require("../Controller/Prodoct-Controller");
 const {
   addCart,
@@ -71,6 +72,7 @@ router.route("/delete-customer/:customerId").delete(deleteCustomer);
 //-------------------------------------------------------------------------------------
 router.route("/add-product").post(addProduct);
 router.route("/get-product").get(getProduct);
+router.route("/get-featured-product").get(getFeaturedProduct);
 router.route("/get-product/:productId").get(getSingleProduct);
 router.route("/edit-product/:productId").put(editproduct);
 router.route("/delete-product/:productId").delete(deleteProduct);

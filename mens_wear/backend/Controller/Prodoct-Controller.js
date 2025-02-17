@@ -76,6 +76,38 @@ const getProduct = async (req, res) => {
     });
   }
 };
+//============================featured products =========================================
+const getFeaturedProduct = async (req, res) => {
+  try {
+    // Fetch the latest 3 products, sorted by creation date
+    const latestProducts = await products
+      .find({})
+      .populate("CategoryId", "categoryName") // Populate categoryName from Category model
+      .sort({ createdAt: -1 }) // Sort by newest first
+      .limit(3) // Get only 3 latest products
+      .exec();
+
+    if (!latestProducts || latestProducts.length === 0) {
+      return res.status(404).json({ message: "No products found" });
+    }
+
+    // Format response with categoryName included
+    const formattedProducts = latestProducts.map((product) => ({
+      ...product.toObject(),
+      categoryName: product.CategoryId.categoryName, // Include categoryName directly
+      CategoryId: product.CategoryId._id, // Keep only CategoryId._id
+    }));
+
+    res.status(200).json(formattedProducts);
+  } catch (error) {
+    console.error("Failed to get latest products", error);
+
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: error.message || "An unexpected error occurred",
+    });
+  }
+};
 
 //--------------------------------------------------------------------------------------------
 //------  get single products , get request ,  /get-product/:poductId
@@ -211,4 +243,5 @@ module.exports = {
   getSingleProduct,
   deleteProduct,
   getAllProductsGroupedByCategory,
+  getFeaturedProduct,
 };

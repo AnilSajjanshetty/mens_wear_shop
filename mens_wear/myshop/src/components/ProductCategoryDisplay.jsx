@@ -20,9 +20,13 @@ const ProductCategoryDisplay = () => {
   return (
     <section id="products" className="py-12 bg-light" style={{ paddingTop: "4rem" }}>
       <div className="container bg-light">
-        {categories.map(({ categoryName, products, _id }) => (
-          <ProductSlider key={_id} categoryName={categoryName} products={products} />
-        ))}
+        {categories.length === 0 ? (
+          <p className="text-center">No products available.</p>
+        ) : (
+          categories.map(({ categoryName, products, _id }) => (
+            <ProductSlider key={_id} categoryName={categoryName} products={products} />
+          ))
+        )}
       </div>
     </section>
   );

@@ -129,7 +129,7 @@ const AllCategory = () => {
                                             <FaTrash
                                                 className="text-danger"
                                                 style={{ cursor: "pointer" }}
-                                                onClick={() => handleDeleteCategory(category._id)}
+                                                onClick={() => handleDeleteCategory(category.CategoryId)}
                                             />
                                         </td>
                                     </tr>
