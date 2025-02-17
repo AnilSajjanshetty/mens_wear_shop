@@ -29,6 +29,7 @@ const {
   editproduct,
   getSingleProduct,
   deleteProduct,
+  getAllProductsGroupedByCategory,
 } = require("../Controller/Prodoct-Controller");
 const {
   addCart,
@@ -73,7 +74,7 @@ router.route("/get-product").get(getProduct);
 router.route("/get-product/:productId").get(getSingleProduct);
 router.route("/edit-product/:productId").put(editproduct);
 router.route("/delete-product/:productId").delete(deleteProduct);
-
+router.route("/get-products-grouped").get(getAllProductsGroupedByCategory);
 //-------------------------------------------------------------------------------------
 //--------- Cart Routes
 //-------------------------------------------------------------------------------------

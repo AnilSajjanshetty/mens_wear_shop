@@ -165,11 +165,50 @@ const deleteProduct = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+//==============get product by category ==============================
+const getAllProductsGroupedByCategory = async (req, res) => {
+  try {
+    const product = await products.aggregate([
+      {
+        $lookup: {
+          from: "categories", // Collection name in MongoDB
+          localField: "CategoryId",
+          foreignField: "_id",
+          as: "categoryDetails",
+        },
+      },
+      { $unwind: "$categoryDetails" }, // Flatten category array
+      {
+        $group: {
+          _id: "$CategoryId",
+          categoryName: { $first: "$categoryDetails.categoryName" },
+          products: {
+            $push: {
+              ProductId: "$_id",
+              ProductName: "$ProductName",
+              Description: "$Description",
+              Price: "$Price",
+              Rating: "$Rating",
+              Stock: "$Stock",
+              Image: "$Image",
+            },
+          },
+        },
+      },
+      { $sort: { categoryName: 1 } }, // Sort by category name
+    ]);
 
+    res.status(200).json(product);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ error: "Failed to fetch products" });
+  }
+};
 module.exports = {
   addProduct,
   getProduct,
   editproduct,
   getSingleProduct,
   deleteProduct,
+  getAllProductsGroupedByCategory,
 };
