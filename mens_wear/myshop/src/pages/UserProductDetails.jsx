@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { Button, Container, Form } from "react-bootstrap";
 import { motion } from "framer-motion";
 import config from "../../config";
@@ -23,7 +23,7 @@ const UserProductDetails = () => {
     useEffect(() => {
         const fetchProductDetails = async () => {
             try {
-                const response = await axios.get(`${server}/get-product/${productId}`);
+                const response = await axiosInstance.get(`/get-product/${productId}`);
                 setProduct(response.data);
                 setSelectedImage(response.data.Image[0]);
             } catch (err) {
@@ -54,7 +54,7 @@ const UserProductDetails = () => {
 
         try {
             const userId = Number(localStorage.getItem("userId"));
-            await axios.post(`${server}/add-cart`, {
+            await axiosInstance.post(`/add-cart`, {
                 UserId: userId,
                 ProductId: product._id,
                 Quantity: quantity,

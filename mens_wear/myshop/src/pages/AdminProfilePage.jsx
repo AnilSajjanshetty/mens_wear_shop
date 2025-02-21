@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Container, Card, Row, Col, Alert, Form, Button } from "react-bootstrap";
 import { motion } from "framer-motion";
-import axios from "axios";
 import config from "../../config";
 import { FaUserCircle } from "react-icons/fa"; // Default profile icon
 import { FiUpload } from "react-icons/fi"; // Upload icon
-import CustomerNavbar from "../components/CustomerNavbar";
 import NavbarComponent from "../components/NavbarComponent";
+import axiosInstance from "../utils/axiosInstance";
 
 const AdminProfilePage = () => {
     const [userProfile, setUserProfile] = useState(null);
@@ -22,7 +21,7 @@ const AdminProfilePage = () => {
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
-                const response = await axios.get(`${server}/get-customer/${userId}`);
+                const response = await axiosInstance.get(`/get-customer/${userId}`);
                 setUserProfile(response.data);
                 setUpdatedProfile(response.data);
             } catch (err) {
@@ -56,7 +55,7 @@ const AdminProfilePage = () => {
                 formData.append("Image", selectedFile);
             }
 
-            const response = await axios.put(`${server}/edit-customer/${userId}`, formData, {
+            const response = await axiosInstance.put(`/edit-customer/${userId}`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
 

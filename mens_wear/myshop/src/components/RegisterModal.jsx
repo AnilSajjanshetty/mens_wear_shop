@@ -2,14 +2,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
+import axiosInstance from "../utils/axiosInstance";
 
 const RegisterModal = ({ closeModal, openLoginModal }) => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
 
   const handleRegister = async (data) => {
     try {
-      const response = await axios.post('http://192.168.43.231:3000/api/v1/register-customer', {
+      const response = await axiosInstance.post('/register-customer', {
         userName: data.name,
         Email: data.email,
         Password: data.password,

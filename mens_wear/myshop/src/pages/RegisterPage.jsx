@@ -2,7 +2,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
+import axiosInstance from "../utils/axiosInstance";
+
 import { NavbarCollapse } from 'react-bootstrap';
 import FooterGuest from '../components/FooterGuest';
 import NavbarGuest from '../components/NavBarGuest';
@@ -13,7 +14,7 @@ const RegisterPage = ({ closeModal, openLoginModal }) => {
   const server = config.server
   const handleRegister = async (data) => {
     try {
-      const response = await axios.post(`${server}/register-customer`, {
+      const response = await axiosInstance.post(`/register-customer`, {
         userName: data.name,
         Email: data.email,
         Password: data.password,

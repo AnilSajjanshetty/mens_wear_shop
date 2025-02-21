@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Card, Row, Col, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { motion } from "framer-motion";
 import CustomerNavbar from "../components/CustomerNavbar";
 import config from "../../config";
@@ -16,7 +16,7 @@ const UserAllProducts = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get(`${server}/get-product`);
+                const response = await axiosInstance.get(`/get-product`);
                 setProducts(response.data || []);
             } catch (err) {
                 setError("Failed to fetch products");

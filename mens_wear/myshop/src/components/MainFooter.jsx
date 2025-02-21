@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { FaStar } from "react-icons/fa";
 import config from "../../config";
 const MainFooter = () => {
@@ -14,7 +14,7 @@ const MainFooter = () => {
     useEffect(() => {
         const fetchFeedback = async () => {
             try {
-                const response = await axios.get(`${server}/get-feedback/${userId}`);
+                const response = await axiosInstance.get(`/get-feedback/${userId}`);
                 if (response.data) {
                     setRating(response.data.rating);
                     setFeedback(response.data.feedbackText);
@@ -36,10 +36,10 @@ const MainFooter = () => {
             const feedbackData = { userId, rating, feedbackText: feedback };
 
             if (feedbackExists) {
-                await axios.put(`${server}/update-feedback`, feedbackData);
+                await axiosInstance.put(`/update-feedback`, feedbackData);
                 alert("Feedback updated successfully!");
             } else {
-                await axios.post(`${server}/add-feedback`, feedbackData);
+                await axiosInstance.post(`/add-feedback`, feedbackData);
                 setFeedbackExists(true);
                 alert("Feedback submitted successfully!");
             }
@@ -53,7 +53,7 @@ const MainFooter = () => {
     const submitContact = async () => {
         try {
             const contactData = { ...contact, message };
-            await axios.post(`${server}/add-contact`, contactData);
+            await axiosInstance.post(`/add-contact`, contactData);
             alert("Contact message submitted successfully!");
             document.getElementById("contactModalClose").click();
         } catch (error) {

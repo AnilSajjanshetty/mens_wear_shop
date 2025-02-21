@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Card, Row, Col, Button } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from "../utils/axiosInstance";
 import { motion } from 'framer-motion';
 import config from '../../config';
 import CustomerNavbar from "../components/CustomerNavbar";
@@ -17,7 +17,7 @@ const UserSingleCategory = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get(`${server}/get-products-by-category/${categoryId}`);
+                const response = await axiosInstance.get(`/get-products-by-category/${categoryId}`);
                 setProducts(Array.isArray(response.data) ? response.data : [response.data] || []);
             } catch (err) {
                 setError('Failed to fetch products');
@@ -30,7 +30,7 @@ const UserSingleCategory = () => {
     useEffect(() => {
         const fetchCategory = async () => {
             try {
-                const response = await axios.get(`${server}/fetch-category/${categoryId}`);
+                const response = await axiosInstance.get(`/fetch-category/${categoryId}`);
                 setCategory(response.data);  // Set the category data
             } catch (err) {
                 setError('Failed to fetch category details');

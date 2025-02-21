@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ProductCard from "./ProductCard";
+import axiosInstance from "../utils/axiosInstance";
 
 const FeaturedProducts = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -8,7 +9,7 @@ const FeaturedProducts = () => {
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
-        const response = await axios.get("http://192.168.248.231:8000/api/v1/get-featured-product");
+        const response = await axiosInstance.get("/get-featured-product");
         setFeaturedProducts(response.data); // Store fetched data in state
       } catch (error) {
         console.error("Error fetching featured products:", error);

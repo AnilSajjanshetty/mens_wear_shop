@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Image } from 'react-bootstrap';
 import NavbarComponent from '../components/NavbarComponent';
 import { motion } from "framer-motion";
-import axios from 'axios';
+import axiosInstance from "../utils/axiosInstance";
 
 const AllCustomers = () => {
     const [customers, setCustomers] = useState([]);
@@ -16,7 +16,7 @@ const AllCustomers = () => {
     useEffect(() => {
         const fetchCustomers = async () => {
             try {
-                const response = await axios.get('http://localhost:8000/api/v1/get-customer');
+                const response = await axiosInstance.get('/get-customer');
                 setCustomers(response.data || []);
             } catch (error) {
                 console.error("Error fetching customers", error);

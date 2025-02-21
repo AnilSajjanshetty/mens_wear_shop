@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
+import axiosInstance from "../utils/axiosInstance";
 import { BrowserRouter as Router, useNavigate } from 'react-router-dom';
 import NavbarGuest from '../components/NavBarGuest';
 import FooterGuest from '../components/FooterGuest';
@@ -14,7 +14,7 @@ const LoginPage = () => {
   const handleLogin = async (data) => {
 
     try {
-      const response = await axios.post(`${server}/login`, data);
+      const response = await axiosInstance.post(`/login`, data);
 
 
       // Store the access token and role in localStorage

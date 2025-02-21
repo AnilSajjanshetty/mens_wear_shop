@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ProductSlider from "./ProductSlider";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 const ProductCategoryDisplay = () => {
   const [categories, setCategories] = useState([]);
@@ -8,7 +8,7 @@ const ProductCategoryDisplay = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://192.168.248.231:8000/api/v1/get-products-grouped");
+        const response = await axiosInstance.get("/get-products-grouped");
         setCategories(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);

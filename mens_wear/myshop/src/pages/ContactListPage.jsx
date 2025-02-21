@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import config from "../../config";
 import { Container, Row, Col, Card, Alert } from "react-bootstrap";
 import { motion } from "framer-motion";
@@ -12,7 +12,7 @@ const ContactListPage = () => {
 
     const fetchContacts = async () => {
         try {
-            const response = await axios.get(`${server}/all-contacts`); // Adjust endpoint if needed
+            const response = await axiosInstance.get(`/all-contacts`); // Adjust endpoint if needed
             setContacts(response.data);
             setError(null);
         } catch (err) {

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Row, Col, Image } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
+import axiosInstance from "../utils/axiosInstance";
 import config from '../../config';
 
 const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
@@ -38,7 +38,7 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get(`${server}/get-category`);
+            const response = await axiosInstance.get(`/get-category`);
             setCategories(response.data || []);
         } catch (error) {
             console.error("Failed to fetch categories", error);
@@ -56,12 +56,12 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
 
         try {
             if (product) {
-                await axios.put(`${server}/edit-product/${product.ProductId}`, formData, {
+                await axiosInstance.put(`/edit-product/${product.ProductId}`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 alert("Product updated successfully");
             } else {
-                await axios.post(`${server}/add-product`, formData, {
+                await axiosInstance.post(`/add-product`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 alert("Product added successfully");

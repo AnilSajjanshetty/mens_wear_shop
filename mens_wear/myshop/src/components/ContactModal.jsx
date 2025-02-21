@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import config from "../../config";
+import axiosInstance from "../utils/axiosInstance";
 
 const ContactModal = ({ closeModal }) => {
   const [contact, setContact] = useState({
@@ -19,7 +19,7 @@ const ContactModal = ({ closeModal }) => {
   const submitContact = async () => {
     try {
       const contactData = { ...contact, message };
-      await axios.post(`${server}/add-contact`, contactData);
+      await axiosInstance.post(`/add-contact`, contactData);
       alert("Contact message submitted successfully!");
       closeModal(); // Close the modal after submission
     } catch (error) {

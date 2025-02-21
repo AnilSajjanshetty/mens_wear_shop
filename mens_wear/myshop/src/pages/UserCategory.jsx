@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Button, Table, Pagination } from 'react-bootstrap';
 import CustomerNavbar from "../components/CustomerNavbar";
 import { motion } from "framer-motion";
-import AddCategoryForm from '../components/AddCategoryForm';
-import axios from 'axios';
+import axiosInstance from "../utils/axiosInstance";
 import SpinnerComponent from '../components/SpinnerComponent';
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa"; // Import icons
 import config from "../../config"
@@ -23,7 +22,7 @@ const UserAllCategory = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get(`${server}/get-category`);
+                const response = await axiosInstance.get(`/get-category`);
                 setCategories(response.data || []);
             } catch (err) {
                 setError('Failed to fetch categories');

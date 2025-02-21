@@ -3,11 +3,11 @@ import { Container, Button, Table, Pagination } from 'react-bootstrap';
 import NavbarComponent from '../components/NavbarComponent';
 import { motion } from "framer-motion";
 import AddCategoryForm from '../components/AddCategoryForm';
-import axios from 'axios';
 import SpinnerComponent from '../components/SpinnerComponent';
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa"; // Import icons
 import config from "../../config"
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../utils/axiosInstance';
 const AllCategory = () => {
     const server = config.server
     const [showModal, setShowModal] = useState(false);
@@ -27,7 +27,7 @@ const AllCategory = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get(`${server}/get-category`);
+                const response = await axiosInstance.get(`/get-category`);
                 setCategories(response.data || []);
             } catch (err) {
                 setError('Failed to fetch categories');
@@ -53,7 +53,7 @@ const AllCategory = () => {
         const confirmDelete = window.confirm("Are you sure you want to delete this category?");
         if (confirmDelete) {
             try {
-                await axios.delete(`${server}/delete-category/${categoryId}`);
+                await axiosInstance.delete(`/delete-category/${categoryId}`);
                 setCategories(categories.filter(category => category._id !== categoryId));
                 alert("Category deleted successfully!");
             } catch (error) {

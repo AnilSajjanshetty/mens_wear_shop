@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import config from "../../config";
 import { Container, Row, Col, Card, Button, Alert } from "react-bootstrap";
 import { motion } from "framer-motion";
@@ -12,7 +12,7 @@ const FeedbackListPage = () => {
 
     const fetchFeedback = async () => {
         try {
-            const response = await axios.get(`${server}/all-feedbacks`); // Adjust endpoint if needed
+            const response = await axiosInstance.get(`/all-feedbacks`); // Adjust endpoint if needed
             setFeedbackList(response.data);
             setError(null);
         } catch (err) {
@@ -27,7 +27,7 @@ const FeedbackListPage = () => {
 
     const deleteFeedback = async (feedbackId) => {
         try {
-            await axios.delete(`${server}/delete-feedback/${feedbackId}`);
+            await axiosInstance.delete(`/delete-feedback/${feedbackId}`);
             alert("Feedback deleted successfully!");
             fetchFeedback(); // Refresh list after deletion
         } catch (err) {

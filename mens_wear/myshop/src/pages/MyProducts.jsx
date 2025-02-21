@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Container, Card, Button, Row, Col, Spinner } from "react-bootstrap";
 import CustomerNavbar from "../components/CustomerNavbar";
 import { motion } from "framer-motion";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import config from "../../config";
 import { useNavigate } from "react-router-dom";
 
@@ -14,7 +14,7 @@ const MyProducts = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get(`${server}/get-product`);
+                const response = await axiosInstance.get(`/get-product`);
                 setProducts(response.data);
             } catch (error) {
                 console.error("Error fetching products:", error);

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Image, Button, Form, Badge } from 'react-bootstrap';
 import NavbarComponent from '../components/NavbarComponent';
 import { motion } from "framer-motion";
-import axios from 'axios';
 import config from '../../config';
+import axiosInstance from '../utils/axiosInstance';
 
 const AllCart = () => {
     const [cartItems, setCartItems] = useState([]);
@@ -17,7 +17,7 @@ const AllCart = () => {
 
     const fetchCart = async () => {
         try {
-            const response = await axios.get(`${server}/get-cart`);
+            const response = await axiosInstance.get(`/get-cart`);
             setCartItems(response.data || []);
         } catch (error) {
             console.error("Error fetching cart data", error);
@@ -27,7 +27,7 @@ const AllCart = () => {
     const updateDeliveryStatus = async (cartId) => {
         try {
             setLoading(true);
-            await axios.put(`${server}/edit-cart/${cartId}`, { DeliveryStatus: selectedStatus[cartId] });
+            await axiosInstance.put(`/edit-cart/${cartId}`, { DeliveryStatus: selectedStatus[cartId] });
             fetchCart();
         } catch (error) {
             console.error("Error updating delivery status", error);
@@ -43,7 +43,7 @@ const AllCart = () => {
             setLoading(true);
 
             // ✅ Updating OrderStatus instead of DeliveryStatus
-            await axios.put(`${server}/edit-cart/${cartId}`, { DeliveryStatus: "Cancelled" });
+            await axiosInstance.put(`/edit-cart/${cartId}`, { DeliveryStatus: "Cancelled" });
 
             fetchCart(); // ✅ Refresh cart data
         } catch (error) {

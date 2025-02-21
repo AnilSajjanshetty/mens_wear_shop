@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Button, Form, Modal, Image, Badge } from "react-bootstrap";
 import CustomerNavbar from "../components/CustomerNavbar";
 import { motion } from "framer-motion";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import config from "../../config";
 
 const MyCart = () => {
@@ -21,7 +21,7 @@ const MyCart = () => {
     const fetchCart = async () => {
         const userId = Number(localStorage.getItem("userId"));
         try {
-            const response = await axios.get(`${server}/get-cart/${userId}`);
+            const response = await axiosInstance.get(`/get-cart/${userId}`);
             setCartItems(response.data || []);
         } catch (error) {
             console.error("Error fetching cart data", error);
@@ -36,7 +36,7 @@ const MyCart = () => {
     const confirmOrder = async () => {
         try {
             setLoading(true);
-            await axios.put(`${server}/confirm-cart/${selectedCartId}`, {
+            await axiosInstance.put(`/confirm-cart/${selectedCartId}`, {
                 OrderStatus: "Confirmed",
                 PaymentStatus: paymentMethod === "Cash on Delivery" ? "Pending" : "Paid",
                 PaymentMethod: paymentMethod,
@@ -55,7 +55,7 @@ const MyCart = () => {
     const cancelOrder = async (cartId) => {
         try {
             setLoading(true);
-            await axios.put(`${server}/edit-cart/${cartId}`, {
+            await axiosInstance.put(`/edit-cart/${cartId}`, {
                 OrderStatus: "Cancelled",
                 PaymentStatus: "Refunded",
                 TransactionId: null,

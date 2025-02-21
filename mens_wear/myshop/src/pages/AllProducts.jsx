@@ -4,7 +4,7 @@ import { Container, Button, Card, Row, Col } from "react-bootstrap";
 import NavbarComponent from "../components/NavbarComponent";
 import { motion } from "framer-motion";
 import AddProductModal from "../components/AddProductModal";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 
 const AllProducts = () => {
@@ -18,9 +18,7 @@ const AllProducts = () => {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get(
-                "http://localhost:8000/api/v1/get-product"
-            );
+            const response = await axiosInstance.get("/get-product");
             setProducts(response.data || []);
         } catch (error) {
             console.error("Failed to fetch products", error);
@@ -35,7 +33,7 @@ const AllProducts = () => {
     const handleDelete = async (productId) => {
         if (window.confirm("Are you sure you want to delete this product?")) {
             try {
-                await axios.delete(`http://localhost:8000/api/v1/delete-product/${productId}`);
+                await axiosInstance.delete(`http://localhost:8000/api/v1/delete-product/${productId}`);
                 fetchProducts();
                 alert("Product deleted successfully");
             } catch (error) {
