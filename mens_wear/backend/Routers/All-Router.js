@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { login, logout } = require("../Controller/Login-Controller");
+const {
+  login,
+  logout,
+  refreshToken,
+} = require("../Controller/Login-Controller");
 // const { login } = require("../Routers/login");  // uncomment this if u want to use Oauth login, and coomemt above
 const { oAuth } = require("../Routers/oauth");
 const { callBack } = require("../Routers/callback");
@@ -119,10 +123,37 @@ router.route("/add-contact").post(submitContactMessage);
 router.route("/all-contacts").get(getAllContacts);
 //===================================================================
 router.route("/login").post(login);
+router.route("/refreshToken").post(refreshToken);
 router.route("/logout").post(logout);
 router.route("/authorize").get(oAuth);
 router.route("/consent").get(concent);
 router.route("/callback").get(callBack);
-router.route("/refreshToken").post(refreshToken);
+// router.route("/refreshToken").post(refreshToken);
 
 module.exports = router;
+// const express = require("express");
+// const router = express.Router();
+// const { authMiddleware, authorizeRoles } = require("../Middleware/authMiddleware");
+// const { login, logout } = require("../Controller/Login-Controller");
+// const { registerCustomer, getAllCustomer } = require("../Controller/Customer-Controller");
+// const { addProduct, deleteProduct } = require("../Controller/Prodoct-Controller");
+// const { getCart } = require("../Controller/Cart-Controller");
+
+// // ---------------- Public Routes (No Auth Required) ----------------
+// router.route("/login").post(login);
+// router.route("/register-customer").post(registerCustomer);
+
+// // ---------------- Customer Routes ----------------
+// router.route("/get-customer").get(authMiddleware, authorizeRoles(["ADMIN"]), getAllCustomer);
+
+// // ---------------- Product Routes ----------------
+// router.route("/add-product").post(authMiddleware, authorizeRoles(["ADMIN", "VENDOR"]), addProduct);
+// router.route("/delete-product/:productId").delete(authMiddleware, authorizeRoles(["ADMIN"]), deleteProduct);
+
+// // ---------------- Cart Routes ----------------
+// router.route("/get-cart").get(authMiddleware, authorizeRoles(["ADMIN", "CUSTOMER"]), getCart);
+
+// // ---------------- Logout ----------------
+// router.route("/logout").post(authMiddleware, logout);
+
+// module.exports = router;
