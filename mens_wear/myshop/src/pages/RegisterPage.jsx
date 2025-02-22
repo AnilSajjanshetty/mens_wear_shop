@@ -1,18 +1,22 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
+import Swal from "sweetalert2";
 import { FaUserCircle } from "react-icons/fa";
 import { FiUpload } from "react-icons/fi";
 
 import FooterGuest from "../components/FooterGuest";
 import NavbarGuest from "../components/NavBarGuest";
 
-const RegisterPage = ({ closeModal, openLoginModal }) => {
+const RegisterPage = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     setValue,
     trigger,
     formState: { errors },
@@ -20,7 +24,7 @@ const RegisterPage = ({ closeModal, openLoginModal }) => {
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
-  const [serverError, setServerError] = useState("");
+  const password = watch("password"); // Watching password field for validation
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -29,24 +33,18 @@ const RegisterPage = ({ closeModal, openLoginModal }) => {
   };
 
   const handleMobileChange = (e) => {
-    const value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+    const value = e.target.value.replace(/\D/g, "");
     if (value.length <= 10) {
       setValue("mobile", value);
     }
   };
 
   const handleNameChange = (e) => {
-    const value = e.target.value.replace(/[^a-zA-Z\s]/g, ""); // Remove non-alphabetic characters
+    const value = e.target.value.replace(/[^a-zA-Z\s]/g, "");
     setValue("name", value);
   };
 
   const handleRegister = async (data) => {
-    setServerError("");
-
-    if (data.password !== data.confirmPassword) {
-      setServerError("Passwords do not match!");
-      return;
-    }
 
     const isValid = await trigger();
     if (!isValid) return;
@@ -66,10 +64,18 @@ const RegisterPage = ({ closeModal, openLoginModal }) => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      closeModal();
+      Swal.fire("Success", "Registration successful!", "success");
+
+      reset();
+      setSelectedFile(null);
+      setPreviewImage(null);
+
+      setTimeout(() => {
+        navigate("/login"); // Redirect after 2 seconds
+      }, 2000);
     } catch (error) {
       console.error("Registration error:", error.response?.data || error.message);
-      setServerError(error.response?.data?.error || "An unexpected error occurred.");
+      Swal.fire("Error", error.response?.data?.error || "An unexpected error occurred.", "error");
     }
   };
 
@@ -98,13 +104,12 @@ const RegisterPage = ({ closeModal, openLoginModal }) => {
         >
           <h2 className="text-center text-white mb-2">Register</h2>
 
-          {/* Profile Image Upload */}
           <div className="text-center mb-3">
-            <div className="position-relative mx-auto mb-2" style={{ width: "120px", height: "120px" }}>
+            <div className="position-relative mx-auto mb-2" style={{ width: "7.5rem", height: "7.5rem" }}>
               {previewImage ? (
                 <img src={previewImage} alt="Profile Preview" className="rounded-circle" style={{ width: "100%", height: "100%" }} />
               ) : (
-                <FaUserCircle size={120} className="text-muted" />
+                <FaUserCircle size={120} className=" text-white" />
               )}
             </div>
             <div className="d-flex justify-content-center">
@@ -115,9 +120,7 @@ const RegisterPage = ({ closeModal, openLoginModal }) => {
             </div>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit(handleRegister)}>
-            {/* Name Field */}
             <div className="mb-1">
               <label className="form-label text-white">Name</label>
               <input
@@ -130,7 +133,6 @@ const RegisterPage = ({ closeModal, openLoginModal }) => {
               {errors.name && <small className="text-white">{errors.name.message}</small>}
             </div>
 
-            {/* Email Field */}
             <div className="mb-1">
               <label className="form-label text-white">Email</label>
               <input
@@ -142,14 +144,13 @@ const RegisterPage = ({ closeModal, openLoginModal }) => {
               {errors.email && <small className="text-white">{errors.email.message}</small>}
             </div>
 
-            {/* Mobile Field */}
             <div className="mb-1">
               <label className="form-label text-white">Mobile Number</label>
               <input
                 type="text"
                 className="form-control"
                 placeholder="Enter your mobile number"
-                {...register("mobile", { required: "Mobile number is required", minLength: { value: 10, message: "Must be 10 digits" } })}
+                {...register("mobile", { required: "Mobile number is required", minLength: { value: 10, message: "Must be 10 digits" }, maxLength: { value: 10, message: "Must not be more than 10 digits" } })}
                 onChange={handleMobileChange}
               />
               {errors.mobile && <small className="text-white">{errors.mobile.message}</small>}
@@ -185,20 +186,35 @@ const RegisterPage = ({ closeModal, openLoginModal }) => {
               {errors.password && <small className="text-white">{errors.password.message}</small>}
             </div>
 
-            {/* Confirm Password */}
             <div className="mb-2">
               <label className="form-label text-white">Confirm Password</label>
-              <input type="password" className="form-control" placeholder="Confirm password" {...register("confirmPassword", { required: "Confirm your password" })} />
+              <input
+                type="password"
+                className="form-control"
+                placeholder="Confirm password"
+                {...register("confirmPassword", {
+                  required: "Confirm your password",
+                  validate: (value) => value === password || "Passwords do not match",
+                })}
+              />
+              {errors.confirmPassword && <small className="text-white">{errors.confirmPassword.message}</small>}
             </div>
 
             <button type="submit" className="btn btn-primary w-100">Register</button>
           </form>
 
-          {serverError && <p className="text-white text-center mt-2">{serverError}</p>}
+
 
           <p className="text-center text-white mt-3">
             Already have an account?{" "}
-            <span className="text-primary" style={{ cursor: "pointer" }} onClick={openLoginModal}>Login</span>
+            <span
+              className="text-white"
+              style={{ cursor: "pointer", textDecoration: "underline" }}
+              onClick={() => navigate("/login")}
+            >
+              Login
+            </span>
+
           </p>
         </div>
       </motion.div>
