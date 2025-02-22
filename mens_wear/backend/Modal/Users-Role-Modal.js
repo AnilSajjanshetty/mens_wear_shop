@@ -1,31 +1,32 @@
 const mongoose = require("mongoose");
-const sanitizeHtml = require("sanitize-html");
 const validator = require("validator");
 
 const rolesSchema = new mongoose.Schema({
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: () => new mongoose.Types.ObjectId(), // Automatically generate _id
+  },
+  UserId: {
+    type: Number,
+    required: [true, "User ID is required"],
+    unique: true,
+    validate: {
+      validator: (value) => validator.isInt(value.toString(), { min: 1 }),
+      message: "User ID must be a valid positive integer",
+    },
+  },
   RoleId: {
     type: Number,
     required: [true, "Role ID is required"],
-    unique: true,
     validate: {
       validator: (value) => validator.isInt(value.toString(), { min: 1 }),
       message: "Role ID must be a valid positive integer",
     },
   },
-  Role: {
-    type: String,
-    required: [true, "Role name is required"],
-    trim: true,
-    minlength: [3, "Role name must be at least 3 characters long"],
-    maxlength: [50, "Role name cannot exceed 50 characters"],
-    set: (value) =>
-      sanitizeHtml(validator.escape(value), {
-        allowedTags: [],
-        allowedAttributes: {},
-      }),
-  },
 });
 
-const roles = mongoose.model("role", rolesSchema);
+// Avoid re-compiling the model if already defined
+const userRole =
+  mongoose.models.userRole || mongoose.model("user_role", rolesSchema);
 
-module.exports = roles;
+module.exports = userRole;
