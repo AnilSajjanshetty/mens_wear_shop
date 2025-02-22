@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { authMiddleware, authorizeRoles } = require("../authMiddleware");
+const { authorizeRoles } = require("../authMiddleware");
 const {
   login,
   logout,
@@ -10,7 +10,7 @@ const {
 const { oAuth } = require("../Routers/oauth");
 const { callBack } = require("../Routers/callback");
 const { concent } = require("../Routers/concent");
-const { refreshToken } = require("../Routers/refreshToken");
+// const { refreshToken } = require("../Routers/refreshToken");
 const {
   getFeedbackByUser,
   submitOrUpdateFeedback,
@@ -65,13 +65,13 @@ const {
 //-------------------------------------------------------------------------------------
 //--------- Customer Routes
 //-------------------------------------------------------------------------------------
-router.use(authMiddleware); // Protect all routes below
 //=======================================================================================
 router.route("/").get(home);
 router.route("/register-customer").post(registerCustomer);
 router.route("/get-customer").get(authorizeRoles([1]), getAllCustomer);
-router.route("/edit-customer/:customerId").putauthorizeRoles([1, 3]),
-  editCustomer;
+router
+  .route("/edit-customer/:customerId")
+  .put(authorizeRoles([1, 3]), editCustomer);
 router
   .route("/get-customer/:customerId")
   .get(authorizeRoles([1, 3]), getSingleCustomer);
@@ -84,9 +84,7 @@ router
 //-------------------------------------------------------------------------------------
 router.route("/add-product").post(authorizeRoles([1]), addProduct);
 router.route("/get-product").get(authorizeRoles([1, 3]), getProduct);
-router
-  .route("/get-featured-product")
-  .get(authorizeRoles([1, 3]), getFeaturedProduct);
+router.route("/get-featured-product").get(getFeaturedProduct);
 router
   .route("/get-product/:productId")
   .get(authorizeRoles([1, 3]), getSingleProduct);
@@ -94,9 +92,7 @@ router.route("/edit-product/:productId").put(authorizeRoles([1]), editproduct);
 router
   .route("/delete-product/:productId")
   .delete(authorizeRoles([1]), deleteProduct);
-router
-  .route("/get-products-grouped")
-  .get(authorizeRoles([1, 3]), getAllProductsGroupedByCategory);
+router.route("/get-products-grouped").get(getAllProductsGroupedByCategory);
 //-------------------------------------------------------------------------------------
 //--------- Cart Routes
 //-------------------------------------------------------------------------------------
@@ -142,7 +138,7 @@ router
   .delete(authorizeRoles([1]), deleteCategory);
 //===================================================================================
 router
-  .route("/get-feedback/:usrId")
+  .route("/get-feedback/:userId")
   .get(authorizeRoles([1, 3]), getFeedbackByUser);
 router
   .route("/add-feedback")

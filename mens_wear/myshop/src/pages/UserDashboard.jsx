@@ -7,7 +7,6 @@ import CustomerNavbar from "../components/CustomerNavbar";
 import MainFooter from "../components/MainFooter";
 
 const UserDashboard = () => {
-  const navigate = useNavigate(); // Hook for navigation
 
   const navbarVariants = {
     hidden: { opacity: 0, y: -50 },
@@ -21,32 +20,7 @@ const UserDashboard = () => {
     },
   };
 
-  // Logout Functionality
-  const handleLogout = async () => {
-    try {
-      const refreshToken = localStorage.getItem("refreshToken"); // Get stored refresh token
 
-      const response = await fetch("http://localhost:8000/api/v1/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token: refreshToken }), // Send refresh token for logout
-      });
-
-      if (response.ok) {
-        localStorage.removeItem("access_token"); // Remove tokens from storage
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("userId");
-        localStorage.removeItem("roleId");
-        navigate("/"); // Redirect to home/login page
-      } else {
-        alert("Logout failed, please try again!");
-      }
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-  };
 
   return (
     <motion.div
@@ -60,34 +34,6 @@ const UserDashboard = () => {
       }}
     >
       <CustomerNavbar />
-      {/* <Navbar bg="dark" expand="lg" className="custom-navbar py-3 shadow">
-        <Container>
-          <Navbar.Brand href="#home">User Dashboard</Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto">
-              <Nav.Link href="#products">Products</Nav.Link>
-              <Nav.Link href="#cart">Cart</Nav.Link>
-            </Nav>
-            <motion.button
-              className="btn btn-primary me-2"
-              variants={buttonVariants}
-              whileHover="hover"
-              onClick={() => alert("Navigating to Profile...")}
-            >
-              Profile
-            </motion.button>
-            <motion.button
-              className="btn btn-danger"
-              variants={buttonVariants}
-              whileHover="hover"
-              onClick={handleLogout} // Call logout function
-            >
-              Logout
-            </motion.button>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar> */}
       <Container className="text-white mt-5 flex-grow-1" >
         <h1 className="text-center">Welcome to the User Dashboard</h1>
         <p className="text-center mt-3">

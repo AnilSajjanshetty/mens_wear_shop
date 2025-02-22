@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
 const AllRouters = require("./Routers/All-Router");
-const authMiddleware = require("./authMiddleware");
+const { authMiddleware } = require("./authMiddleware");
 const config = require("./Config/config");
 
 const HOST = config.HOST;

@@ -18,8 +18,8 @@ const LoginPage = () => {
 
 
       // Store the access token and role in localStorage
-      const { access_token, userId, roleId, refreshToken } = response.data;
-      localStorage.setItem('access_token', access_token);
+      const { accessToken, userId, roleId, refreshToken } = response.data;
+      localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('userId', userId);
       localStorage.setItem('roleId', roleId);

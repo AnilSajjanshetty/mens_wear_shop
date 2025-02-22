@@ -3,27 +3,9 @@ const jwt = require("jsonwebtoken");
 const config = require("../Config/config");
 const User = require("../Modal/User-Modal");
 const userToken = require("../Modal/User-Token");
-
+const userRole = require("../Modal/Users-Role-Modal");
 const ACCESS_TOKEN_EXPIRY = "15m";
 const REFRESH_TOKEN_EXPIRY = "7d";
-
-// Generate Access Token
-const generateAccessToken = (user) => {
-  return jwt.sign(
-    { userId: user._id, email: user.Email, roleId: user.roleId },
-    config.ACCESS_TOKEN_SECRET,
-    { expiresIn: ACCESS_TOKEN_EXPIRY }
-  );
-};
-
-// Generate Refresh Token
-const generateRefreshToken = (user) => {
-  return jwt.sign(
-    { userId: user._id, email: user.Email, roleId: user.roleId },
-    config.REFRESH_TOKEN_SECRET,
-    { expiresIn: REFRESH_TOKEN_EXPIRY }
-  );
-};
 
 // 🟢 Login Controller
 const login = async (req, res) => {
@@ -37,18 +19,22 @@ const login = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
+    const roleOfUser = await userRole.findOne({ UserId: user.UserId });
 
     const isPasswordValid = await bcrypt.compare(password, user.Password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const userId = user.UserId;
+    const roleId = roleOfUser.RoleId;
+
+    const accessToken = generateAccessToken(userId, email, roleId);
+    const refreshToken = generateRefreshToken(userId, email, roleId);
 
     // Store tokens in database
     await userToken.findOneAndUpdate(
-      { userId: user._id },
+      { userId: user.UserId },
       { accessToken, refreshToken },
       { upsert: true }
     );
@@ -56,15 +42,27 @@ const login = async (req, res) => {
     res.status(200).json({
       accessToken,
       refreshToken,
-      userId: user.userId,
-      roleId: user.roleId,
+      userId,
+      roleId,
     });
   } catch (error) {
     console.error("Error:", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+// Generate Access Token
+const generateAccessToken = (userId, email, roleId) => {
+  return jwt.sign({ userId, email, roleId }, config.ACCESS_TOKEN_SECRET, {
+    expiresIn: ACCESS_TOKEN_EXPIRY,
+  });
+};
 
+// Generate Refresh Token
+const generateRefreshToken = (userId, email, roleId) => {
+  return jwt.sign({ userId, email, roleId }, config.REFRESH_TOKEN_SECRET, {
+    expiresIn: REFRESH_TOKEN_EXPIRY,
+  });
+};
 // 🟢 Refresh Token Controller
 const refreshToken = async (req, res) => {
   const { token } = req.body;

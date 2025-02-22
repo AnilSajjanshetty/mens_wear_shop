@@ -138,24 +138,24 @@ const getCart = async (req, res) => {
 const getSingleCart = async (req, res) => {
   try {
     const customerId = req.params.userId;
-    console.log({ customerId });
 
     // Fetch cart with product details
-    const cart = await carts.find({ UserId: customerId }).populate("ProductId");
-
-    console.log({ cart });
+    const cart = await carts
+      .find({ UserId: customerId })
+      .populate("ProductId")
+      .exec();
 
     if (cart.length > 0) {
       // Extract only product details
       const products = cart.map((item) => ({
-        ProductId: item.ProductId.ProductId,
-        ProductName: item.ProductId.ProductName,
-        Description: item.ProductId.Description,
-        Price: item.ProductId.Price,
-        Rating: item.ProductId.Rating,
-        Stock: item.ProductId.Stock,
-        CategoryId: item.ProductId.CategoryId,
-        Images: item.ProductId.Image, // Array of images
+        ProductId: item.ProductId?.ProductId,
+        ProductName: item.ProductId?.ProductName,
+        Description: item.ProductId?.Description,
+        Price: item.ProductId?.Price,
+        Rating: item.ProductId?.Rating,
+        Stock: item.ProductId?.Stock,
+        CategoryId: item.ProductId?.CategoryId,
+        Images: item.ProductId?.Image, // Array of images
         Quantity: item.Quantity,
         OrderStatus: item.OrderStatus,
         DeliveryStatus: item.DeliveryStatus,

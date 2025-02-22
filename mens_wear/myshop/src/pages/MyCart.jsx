@@ -90,6 +90,7 @@ const MyCart = () => {
                                             fluid
                                             className="rounded-start"
                                             style={{ maxHeight: "200px", objectFit: "cover", width: "100%" }}
+                                            loading="lazy"
                                         />
                                     </Col>
 

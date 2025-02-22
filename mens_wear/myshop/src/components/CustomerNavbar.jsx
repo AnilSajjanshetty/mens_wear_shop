@@ -3,6 +3,7 @@ import { Navbar, Nav, Container } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import "./NavbarComponent.css"; // Import styles
+import axiosInstance from "../utils/axiosInstance";
 
 const CustomerNavbar = () => {
 
@@ -18,16 +19,11 @@ const CustomerNavbar = () => {
         try {
             const refreshToken = localStorage.getItem("refreshToken");
 
-            const response = await fetch("http://localhost:8000/api/v1/logout", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ token: refreshToken }),
-            });
-
-            if (response.ok) {
-                localStorage.removeItem("access_token");
+            const response = await axiosInstance.post("/logout",
+                { token: refreshToken }
+            );
+            if (response.status == 200) {
+                localStorage.removeItem("accessToken");
                 localStorage.removeItem("refreshToken");
                 localStorage.removeItem("userId");
                 localStorage.removeItem("roleId");
