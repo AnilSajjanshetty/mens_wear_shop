@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import { FaStar } from "react-icons/fa";
+import Swal from "sweetalert2"; // Import SweetAlert
 import config from "../../config";
+
 const MainFooter = () => {
     const [rating, setRating] = useState(0);
     const [hover, setHover] = useState(null);
@@ -10,7 +12,8 @@ const MainFooter = () => {
     const [contact, setContact] = useState({ name: "", email: "", mobileNo: "", address: "" });
     const [feedbackExists, setFeedbackExists] = useState(false);
     const userId = 1; // Replace with actual user ID
-    const server = config.server
+    const server = config.server;
+
     useEffect(() => {
         const fetchFeedback = async () => {
             try {
@@ -37,16 +40,33 @@ const MainFooter = () => {
 
             if (feedbackExists) {
                 await axiosInstance.put(`/update-feedback`, feedbackData);
-                alert("Feedback updated successfully!");
+                Swal.fire({
+                    title: "Feedback Updated!",
+                    text: "Your feedback has been successfully updated.",
+                    icon: "success",
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
             } else {
                 await axiosInstance.post(`/add-feedback`, feedbackData);
                 setFeedbackExists(true);
-                alert("Feedback submitted successfully!");
+                Swal.fire({
+                    title: "Feedback Submitted!",
+                    text: "Thank you for your feedback!",
+                    icon: "success",
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
             }
             document.getElementById("feedbackModalClose").click();
         } catch (error) {
             console.error("Error submitting feedback:", error);
-            alert("Failed to submit feedback. Please try again.");
+            Swal.fire({
+                title: "Submission Failed",
+                text: "Something went wrong. Please try again.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+            });
         }
     };
 
@@ -54,11 +74,22 @@ const MainFooter = () => {
         try {
             const contactData = { ...contact, message };
             await axiosInstance.post(`/add-contact`, contactData);
-            alert("Contact message submitted successfully!");
+            Swal.fire({
+                title: "Message Sent!",
+                text: "We have received your message and will get back to you soon.",
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false,
+            });
             document.getElementById("contactModalClose").click();
         } catch (error) {
             console.error("Error submitting contact message:", error);
-            alert("Failed to submit message. Please try again.");
+            Swal.fire({
+                title: "Submission Failed",
+                text: "Could not send your message. Please try again later.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+            });
         }
     };
 
@@ -66,7 +97,7 @@ const MainFooter = () => {
         background: "linear-gradient(135deg, #ff7f50, #ff1493, #8a2be2, #ff1493, #ff7f50)",
         borderRadius: "8px",
         color: "#fff",
-        padding: "20px"
+        padding: "20px",
     };
 
     return (

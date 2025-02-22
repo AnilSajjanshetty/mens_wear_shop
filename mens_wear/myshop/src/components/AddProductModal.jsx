@@ -1,25 +1,21 @@
-// src/components/AddProductModal.js
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Row, Col, Image } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import axiosInstance from "../utils/axiosInstance";
+import Swal from "sweetalert2";
 import config from '../../config';
 
 const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
     const { register, handleSubmit, reset, setValue } = useForm();
     const [categories, setCategories] = useState([]);
-    // Initialize with an empty array
     const [selectedImages, setSelectedImages] = useState([]);
 
-    // Populate selectedImages when product changes
     useEffect(() => {
         if (product?.Image) {
             setSelectedImages(product.Image);
         }
     }, [product]);
-    console.log({ product })
-    console.log({ selectedImages })
-    const server = config.server
+
     useEffect(() => {
         fetchCategories();
     }, []);
@@ -33,6 +29,7 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
             setValue("CategoryId", product.CategoryId);
         } else {
             reset();
+            setSelectedImages([]); // Clear images when adding a new product
         }
     }, [product, setValue, reset]);
 
@@ -59,19 +56,22 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
                 await axiosInstance.put(`/edit-product/${product.ProductId}`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
-                alert("Product updated successfully");
+                Swal.fire("Success", "Product updated successfully!", "success");
             } else {
                 await axiosInstance.post(`/add-product`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
-                alert("Product added successfully");
+                Swal.fire("Success", "Product added successfully!", "success");
             }
+
+            // **Reset form and clear images after success**
             reset();
+            setSelectedImages([]);
             refreshProducts();
             handleClose();
         } catch (error) {
             console.error("Error saving product", error);
-            alert("Failed to save product");
+            Swal.fire("Error", "Failed to save product!", "error");
         }
     };
 
@@ -81,7 +81,7 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
     };
 
     const handleImageSelection = (e) => {
-        const files = Array.from(e.target.files); // Convert FileList to array
+        const files = Array.from(e.target.files);
         setSelectedImages(prevImages => [...prevImages, ...files]);
     };
 
@@ -130,13 +130,12 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
                     {/* Display selected images */}
                     <Row>
                         {selectedImages.length > 0 && selectedImages.map((image, index) => (
-
                             <Col key={index} xs={6} md={4} lg={3} className="mb-2">
                                 <div style={{ position: 'relative' }} className='g-0 d-flex align-items-start'>
                                     <Image
                                         src={typeof image === 'string'
-                                            ? `http://localhost:8000/${image}` // Existing image from server
-                                            : URL.createObjectURL(image)      // New image from file input
+                                            ? `http://localhost:8000/${image}`
+                                            : URL.createObjectURL(image)
                                         }
                                         alt={`Selected Image ${index + 1}`}
                                         style={{ width: '60px', height: '60px', objectFit: 'cover' }}
@@ -145,7 +144,6 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
                                         variant="danger"
                                         size="sm"
                                         style={{
-
                                             top: '-5px',
                                             right: '-5px',
                                             padding: '0',
@@ -155,14 +153,13 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
                                             display: 'flex',
                                             justifyContent: 'center',
                                             alignItems: 'center',
-                                            fontSize: '14px', // Adjust font size for the cross
-                                            lineHeight: '1',  // Adjust line height to help with vertical centering
+                                            fontSize: '14px',
+                                            lineHeight: '1',
                                         }}
                                         onClick={() => handleRemoveImage(index)}
                                     >
                                         &times;
                                     </Button>
-
                                 </div>
                             </Col>
                         ))}

@@ -2,37 +2,66 @@ import React from "react";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import "./NavbarComponent.css"; // Import styles
 import axiosInstance from "../utils/axiosInstance";
 
 const CustomerNavbar = () => {
-
     const buttonVariants = {
-        hover: {
-            scale: 1.1,
-            transition: { duration: 0.3 },
-        },
+        hover: { scale: 1.1, transition: { duration: 0.3 } },
     };
     const navigate = useNavigate();
 
     const handleLogout = async () => {
-        try {
-            const refreshToken = localStorage.getItem("refreshToken");
+        const confirmLogout = await Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, logout!",
+        });
 
-            const response = await axiosInstance.post("/logout",
-                { token: refreshToken }
-            );
-            if (response.status == 200) {
-                localStorage.removeItem("accessToken");
-                localStorage.removeItem("refreshToken");
-                localStorage.removeItem("userId");
-                localStorage.removeItem("roleId");
-                navigate("/"); // Redirect to home/login page
-            } else {
-                alert("Logout failed, please try again!");
+        if (confirmLogout.isConfirmed) {
+            try {
+                const refreshToken = localStorage.getItem("refreshToken");
+                const response = await axiosInstance.post("/logout", { token: refreshToken });
+
+                if (response.status === 200) {
+                    localStorage.removeItem("accessToken");
+                    localStorage.removeItem("refreshToken");
+                    localStorage.removeItem("userId");
+                    localStorage.removeItem("roleId");
+
+                    Swal.fire({
+                        title: "Logged Out!",
+                        text: "You have been successfully logged out.",
+                        icon: "success",
+                        timer: 2000,
+                        showConfirmButton: false,
+                    });
+
+                    setTimeout(() => {
+                        navigate("/"); // Redirect to home/login page after Swal
+                    }, 2000);
+                } else {
+                    Swal.fire({
+                        title: "Logout Failed",
+                        text: "Something went wrong. Please try again.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                    });
+                }
+            } catch (error) {
+                console.error("Logout error:", error);
+                Swal.fire({
+                    title: "Error",
+                    text: "Logout request failed. Please try again.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                });
             }
-        } catch (error) {
-            console.error("Logout error:", error);
         }
     };
 
@@ -48,7 +77,8 @@ const CustomerNavbar = () => {
                         <Nav className="me-auto">
                             <Nav.Link href="/user/products" className="text-white fw-semibold">
                                 Products
-                            </Nav.Link>  <Nav.Link href="/user/allcategory" className="text-white fw-semibold">
+                            </Nav.Link>
+                            <Nav.Link href="/user/allcategory" className="text-white fw-semibold">
                                 Categories
                             </Nav.Link>
                             <Nav.Link href="/user/mycart" className="text-white fw-semibold">

@@ -27,14 +27,8 @@ const LoginModal = ({ closeModal, openRegisterModal }) => {
     try {
       const response = await axiosInstance.post('/login', loginData);
 
-      // // Store the access token and role in localStorage
-      const { access_token, userId, roleId, roleDetails } = response.data;
-      // localStorage.setItem('access_token', access_token);
-      // localStorage.setItem('userId', userId);
-      // localStorage.setItem('roleId', roleId);
-      // localStorage.setItem('roleDetails', JSON.stringify(roleDetails));
+      const { roleId, } = response.data;
 
-      // Redirect user based on their role
       if (roleId === 1) {
         // Admin
         navigate('/admin');

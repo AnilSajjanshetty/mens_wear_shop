@@ -6,6 +6,7 @@ import config from "../../config";
 import { FaUserCircle } from "react-icons/fa"; // Default profile icon
 import { FiUpload } from "react-icons/fi"; // Upload icon
 import CustomerNavbar from "../components/CustomerNavbar";
+import Swal from "sweetalert2";
 
 const UserProfilePage = () => {
     const [userProfile, setUserProfile] = useState(null);
@@ -62,9 +63,22 @@ const UserProfilePage = () => {
             setUserProfile(response.data);
             setEditing(false);
             setSelectedFile(null);
+
+            Swal.fire({
+                title: "Success!",
+                text: "Your profile has been updated successfully.",
+                icon: "success",
+                confirmButtonText: "OK",
+            });
         } catch (err) {
             console.error("Error updating profile:", err);
             setError("Failed to update profile.");
+            Swal.fire({
+                title: "Error!",
+                text: "Failed to update your profile. Please try again.",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
         } finally {
             setLoading(false);
         }
@@ -125,42 +139,12 @@ const UserProfilePage = () => {
 
                                             <Form.Group className="mb-3">
                                                 <Form.Label className="fw-bold">Name</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="userName"
-                                                    value={updatedProfile.userName}
-                                                    onChange={handleInputChange}
-                                                />
+                                                <Form.Control type="text" name="userName" value={updatedProfile.userName} onChange={handleInputChange} />
                                             </Form.Group>
 
                                             <Form.Group className="mb-3">
                                                 <Form.Label className="fw-bold">Email</Form.Label>
-                                                <Form.Control
-                                                    type="email"
-                                                    name="Email"
-                                                    value={updatedProfile.Email}
-                                                    onChange={handleInputChange}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group className="mb-3">
-                                                <Form.Label className="fw-bold">Mobile Number</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="MobileNo"
-                                                    value={updatedProfile.MobileNo}
-                                                    onChange={handleInputChange}
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group className="mb-3">
-                                                <Form.Label className="fw-bold">Address</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="Address"
-                                                    value={updatedProfile.Address}
-                                                    onChange={handleInputChange}
-                                                />
+                                                <Form.Control type="email" name="Email" value={updatedProfile.Email} onChange={handleInputChange} />
                                             </Form.Group>
 
                                             <Button variant="success" onClick={handleUpdateProfile} disabled={loading}>
@@ -173,17 +157,7 @@ const UserProfilePage = () => {
                                     ) : (
                                         <>
                                             <Card.Title className="fw-bold fs-4">{userProfile.userName}</Card.Title>
-                                            <Card.Subtitle className="mb-3 text-muted">{userProfile.Email}</Card.Subtitle>
-                                            <Card.Text className="fw-medium">
-                                                <strong>📞 Mobile:</strong> {userProfile.MobileNo} <br />
-                                                <strong>🏠 Address:</strong> {userProfile.Address}
-                                            </Card.Text>
-                                            <motion.button
-                                                className="btn btn-warning"
-                                                onClick={() => setEditing(true)}
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 0.95 }}
-                                            >
+                                            <motion.button className="btn btn-warning" onClick={() => setEditing(true)} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                                 Edit Profile
                                             </motion.button>
                                         </>

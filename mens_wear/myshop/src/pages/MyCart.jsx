@@ -4,6 +4,7 @@ import CustomerNavbar from "../components/CustomerNavbar";
 import { motion } from "framer-motion";
 import axiosInstance from "../utils/axiosInstance";
 import config from "../../config";
+import Swal from "sweetalert2";
 
 const MyCart = () => {
     const [cartItems, setCartItems] = useState([]);
@@ -43,29 +44,43 @@ const MyCart = () => {
                 TransactionId: paymentMethod === "Cash on Delivery" ? null : transactionId,
             });
             setShowModal(false);
+            Swal.fire("Success", "Order confirmed successfully!", "success");
             fetchCart();
         } catch (error) {
+            Swal.fire("Error", "Failed to confirm order", "error");
             console.error("Error confirming order", error);
         } finally {
             setLoading(false);
         }
     };
 
-
     const cancelOrder = async (cartId) => {
-        try {
-            setLoading(true);
-            await axiosInstance.put(`/edit-cart/${cartId}`, {
-                OrderStatus: "Cancelled",
-                PaymentStatus: "Refunded",
-                TransactionId: null,
-            });
-            fetchCart();
-        } catch (error) {
-            console.error("Error cancelling order", error);
-        } finally {
-            setLoading(false);
-        }
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you really want to cancel this order?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, cancel it!",
+            cancelButtonText: "No, keep it",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    setLoading(true);
+                    await axiosInstance.put(`/edit-cart/${cartId}`, {
+                        OrderStatus: "Cancelled",
+                        PaymentStatus: "Refunded",
+                        TransactionId: null,
+                    });
+                    Swal.fire("Cancelled", "Your order has been cancelled.", "success");
+                    fetchCart();
+                } catch (error) {
+                    Swal.fire("Error", "Failed to cancel order", "error");
+                    console.error("Error cancelling order", error);
+                } finally {
+                    setLoading(false);
+                }
+            }
+        });
     };
 
     return (
@@ -82,7 +97,6 @@ const MyCart = () => {
                         <Col key={item.CartId} md={6} lg={6}>
                             <Card className="mb-4 shadow-lg">
                                 <Row className="g-0">
-                                    {/* Left: Image */}
                                     <Col md={4} className="d-flex align-items-center">
                                         <Image
                                             src={item.Images?.[0] ? `http://localhost:8000/${item.Images[0]}` : "/placeholder.jpg"}
@@ -93,19 +107,13 @@ const MyCart = () => {
                                             loading="lazy"
                                         />
                                     </Col>
-
-                                    {/* Right: Product Details */}
                                     <Col md={8}>
                                         <Card.Body>
                                             <Card.Title>{item.ProductName}</Card.Title>
                                             <Card.Text>
                                                 💰 <strong>${item.Price}</strong> <br />
                                                 📦 Quantity: <strong>{item.Quantity}x</strong> <br />
-                                                🏷Order Status:{" "}
-                                                <Badge bg={item.OrderStatus === "Confirmed" ? "success" : "warning"}>
-                                                    {item.OrderStatus}
-                                                </Badge>{" "}
-                                                <br />
+                                                🏷 Order Status: <Badge bg={item.OrderStatus === "Confirmed" ? "success" : "warning"}>{item.OrderStatus}</Badge> <br />
                                                 {item.OrderStatus === "Confirmed" && (
                                                     <>
                                                         🚚 Delivery Status: <Badge bg="info">{item.DeliveryStatus}</Badge> <br />
@@ -113,12 +121,8 @@ const MyCart = () => {
                                                     </>
                                                 )}
                                                 🏦 Payment Status:
-                                                <Badge bg={item.PaymentStatus === "Paid" ? "success" : "warning"}>
-                                                    {item.PaymentStatus}
-                                                </Badge>
+                                                <Badge bg={item.PaymentStatus === "Paid" ? "success" : "warning"}>{item.PaymentStatus}</Badge>
                                             </Card.Text>
-
-                                            {/* Buttons for Order Actions */}
                                             {item.OrderStatus === "Pending" ? (
                                                 <Button variant="success" onClick={() => handleConfirmOrder(item.CartId)}>
                                                     Confirm Order
@@ -137,8 +141,6 @@ const MyCart = () => {
                         </Col>
                     ))}
                 </Row>
-
-                {/* Order Confirmation Modal */}
                 <Modal show={showModal} onHide={() => setShowModal(false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>Confirm Order</Modal.Title>
@@ -155,18 +157,11 @@ const MyCart = () => {
                         </Form.Group>
                         <Form.Group className="mt-3">
                             <Form.Label>Transaction ID</Form.Label>
-                            <Form.Control
-                                type="text"
-                                disabled={paymentMethod === "Cash on Delivery"}
-                                onChange={(e) => setTransactionId(e.target.value)}
-                            />
+                            <Form.Control type="text" disabled={paymentMethod === "Cash on Delivery"} onChange={(e) => setTransactionId(e.target.value)} />
                         </Form.Group>
                     </Modal.Body>
                     <Modal.Footer>
-
-                        <Button disabled={loading} onClick={confirmOrder}>
-                            {loading ? "Processing..." : "Confirm"}
-                        </Button>
+                        <Button disabled={loading} onClick={confirmOrder}>{loading ? "Processing..." : "Confirm"}</Button>
                     </Modal.Footer>
                 </Modal>
             </Container>

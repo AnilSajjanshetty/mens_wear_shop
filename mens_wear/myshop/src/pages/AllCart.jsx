@@ -4,6 +4,7 @@ import NavbarComponent from '../components/NavbarComponent';
 import { motion } from "framer-motion";
 import config from '../../config';
 import axiosInstance from '../utils/axiosInstance';
+import Swal from "sweetalert2";
 
 const AllCart = () => {
     const [cartItems, setCartItems] = useState([]);
@@ -27,32 +28,56 @@ const AllCart = () => {
     const updateDeliveryStatus = async (cartId) => {
         try {
             setLoading(true);
+            const { isConfirmed } = await Swal.fire({
+                title: "Update Delivery Status?",
+                text: "Are you sure you want to update this order's status?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Yes, update it!",
+            });
+
+            if (!isConfirmed) {
+                setLoading(false);
+                return;
+            }
+
             await axiosInstance.put(`/edit-cart/${cartId}`, { DeliveryStatus: selectedStatus[cartId] });
             fetchCart();
+
+            Swal.fire("Updated!", "The order status has been updated.", "success");
         } catch (error) {
             console.error("Error updating delivery status", error);
+            Swal.fire("Error", "Failed to update status. Try again later.", "error");
         } finally {
             setLoading(false);
         }
     };
 
     const cancelOrder = async (cartId) => {
-        if (!window.confirm("Are you sure you want to cancel this order?")) return;
+        const { isConfirmed } = await Swal.fire({
+            title: "Cancel Order?",
+            text: "Are you sure you want to cancel this order?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, cancel it!",
+            cancelButtonText: "No, keep it",
+        });
+
+        if (!isConfirmed) return;
 
         try {
             setLoading(true);
-
-            // ✅ Updating OrderStatus instead of DeliveryStatus
             await axiosInstance.put(`/edit-cart/${cartId}`, { DeliveryStatus: "Cancelled" });
+            fetchCart();
 
-            fetchCart(); // ✅ Refresh cart data
+            Swal.fire("Cancelled!", "The order has been cancelled.", "success");
         } catch (error) {
             console.error("Error canceling order", error);
+            Swal.fire("Error", "Failed to cancel order. Try again later.", "error");
         } finally {
             setLoading(false);
         }
     };
-
 
     return (
         <motion.div
@@ -75,7 +100,6 @@ const AllCart = () => {
                                 <Card className="shadow-sm p-2 d-flex flex-md-row align-items-center"
                                     style={{ borderRadius: "10px", overflow: "hidden", border: "1px solid #ddd", background: "#ffffff" }}>
 
-                                    {/* Image Section */}
                                     <div className="p-2 d-flex align-items-center justify-content-center bg-light"
                                         style={{ minWidth: "100px", minHeight: "100px", borderRadius: "8px" }}>
                                         <Image
@@ -85,18 +109,14 @@ const AllCart = () => {
                                         />
                                     </div>
 
-                                    {/* Product Info */}
                                     <Card.Body className="p-2 w-100">
                                         <Card.Title className="mb-1">{item.ProductDetails?.Name || "Unknown Product"}</Card.Title>
-
-                                        {/* Compact Product Details */}
                                         <Card.Text className="text-muted mb-2" style={{ fontSize: "0.9rem" }}>
                                             💰 <strong>${item.ProductDetails?.Price}</strong> | 🏷 <strong>{item.ProductDetails?.Category}</strong> <br />
                                             📦 Stock: <strong>{item.ProductDetails?.Stock}</strong> | 🛒 Qty: <strong>{item.Quantity}</strong> <br />
                                             💵 Total: <strong className="text-dark">${item.ProductDetails?.Price * item.Quantity}</strong>
                                         </Card.Text>
 
-                                        {/* Payment Info */}
                                         <div className="d-flex justify-content-between align-items-center">
                                             <div>
                                                 <strong>Payment:</strong>
@@ -132,15 +152,13 @@ const AllCart = () => {
                                             </Form.Select>
                                         </div>
 
-                                        {/* Action Buttons */}
                                         <div className="d-flex gap-2 mt-3">
                                             <Button
                                                 variant="primary"
                                                 size="sm"
                                                 className="w-50"
                                                 disabled={loading}
-                                                onClick={() => updateDeliveryStatus(item.CartId)}
-                                            >
+                                                onClick={() => updateDeliveryStatus(item.CartId)}>
                                                 Update Status
                                             </Button>
 
@@ -149,8 +167,7 @@ const AllCart = () => {
                                                 size="sm"
                                                 className="w-50"
                                                 disabled={loading}
-                                                onClick={() => cancelOrder(item.CartId)}
-                                            >
+                                                onClick={() => cancelOrder(item.CartId)}>
                                                 Cancel Order
                                             </Button>
                                         </div>

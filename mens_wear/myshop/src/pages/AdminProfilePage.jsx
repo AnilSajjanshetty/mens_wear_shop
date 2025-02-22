@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Container, Card, Row, Col, Alert, Form, Button } from "react-bootstrap";
 import { motion } from "framer-motion";
 import config from "../../config";
-import { FaUserCircle } from "react-icons/fa"; // Default profile icon
-import { FiUpload } from "react-icons/fi"; // Upload icon
+import { FaUserCircle } from "react-icons/fa";
+import { FiUpload } from "react-icons/fi";
 import NavbarComponent from "../components/NavbarComponent";
 import axiosInstance from "../utils/axiosInstance";
+import Swal from "sweetalert2";
 
 const AdminProfilePage = () => {
     const [userProfile, setUserProfile] = useState(null);
@@ -62,9 +63,27 @@ const AdminProfilePage = () => {
             setUserProfile(response.data);
             setEditing(false);
             setSelectedFile(null);
+
+            // Show success message
+            Swal.fire({
+                title: "Success!",
+                text: "Profile updated successfully.",
+                icon: "success",
+                confirmButtonColor: "#3085d6",
+            });
+
         } catch (err) {
             console.error("Error updating profile:", err);
             setError("Failed to update profile.");
+
+            // Show error message
+            Swal.fire({
+                title: "Error!",
+                text: "Failed to update profile. Please try again.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+            });
+
         } finally {
             setLoading(false);
         }

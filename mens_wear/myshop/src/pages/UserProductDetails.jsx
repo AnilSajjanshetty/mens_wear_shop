@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import config from "../../config";
 import { FiPlus, FiMinus } from "react-icons/fi";
 import CustomerNavbar from "../components/CustomerNavbar";
+import Swal from "sweetalert2"; // Import SweetAlert
 
 const UserProductDetails = () => {
     const { productId } = useParams();
@@ -17,7 +18,7 @@ const UserProductDetails = () => {
     const [quantity, setQuantity] = useState(1);
     const server = config.server;
     const navigate = useNavigate();
-    const role = localStorage.getItem('roleId');
+    const role = localStorage.getItem("roleId");
     const userRoleId = Number(import.meta.env.VITE_USER_ROLE_ID);
 
     useEffect(() => {
@@ -46,7 +47,11 @@ const UserProductDetails = () => {
         if (!product) return;
 
         if (quantity < 1 || quantity > product.Stock) {
-            alert("Please select a valid quantity.");
+            Swal.fire({
+                title: "Invalid Quantity",
+                text: "Please select a valid quantity.",
+                icon: "warning",
+            });
             return;
         }
 
@@ -64,10 +69,20 @@ const UserProductDetails = () => {
                 PaymentStatus: "Pending",
             });
 
-            alert("Product added to cart successfully!");
+            Swal.fire({
+                title: "Added to Cart!",
+                text: "Product has been successfully added to your cart.",
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false,
+            });
         } catch (err) {
             console.error("Failed to add product to cart", err);
-            alert("Failed to add to cart");
+            Swal.fire({
+                title: "Error",
+                text: "Failed to add product to cart. Please try again.",
+                icon: "error",
+            });
         } finally {
             setAddingToCart(false);
         }
@@ -97,15 +112,21 @@ const UserProductDetails = () => {
                             style={{ width: "100%", borderRadius: "10px", boxShadow: "0 4px 8px rgba(0,0,0,0.2)" }}
                         />
                         <div style={{ display: "flex", justifyContent: "center", marginTop: "10px", gap: "10px" }}>
-                            {product.Image && product.Image.map((image, index) => (
-                                <img
-                                    key={index}
-                                    src={`http://localhost:8000/${image}`}
-                                    alt="Thumbnail"
-                                    style={{ width: "60px", height: "60px", cursor: "pointer", border: selectedImage === image ? "2px solid #ff512f" : "none" }}
-                                    onClick={() => setSelectedImage(image)}
-                                />
-                            ))}
+                            {product.Image &&
+                                product.Image.map((image, index) => (
+                                    <img
+                                        key={index}
+                                        src={`http://localhost:8000/${image}`}
+                                        alt="Thumbnail"
+                                        style={{
+                                            width: "60px",
+                                            height: "60px",
+                                            cursor: "pointer",
+                                            border: selectedImage === image ? "2px solid #ff512f" : "none",
+                                        }}
+                                        onClick={() => setSelectedImage(image)}
+                                    />
+                                ))}
                         </div>
                     </div>
 
@@ -131,7 +152,15 @@ const UserProductDetails = () => {
                                             <FiMinus />
                                         </Button>
 
-                                        <span style={{ fontSize: "1.2rem", fontWeight: "bold", minWidth: "40px", textAlign: "center", color: "white" }}>
+                                        <span
+                                            style={{
+                                                fontSize: "1.2rem",
+                                                fontWeight: "bold",
+                                                minWidth: "40px",
+                                                textAlign: "center",
+                                                color: "white",
+                                            }}
+                                        >
                                             {quantity}
                                         </span>
 

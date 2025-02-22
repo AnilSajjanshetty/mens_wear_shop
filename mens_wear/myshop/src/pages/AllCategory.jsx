@@ -1,28 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Button, Table, Pagination } from 'react-bootstrap';
 import NavbarComponent from '../components/NavbarComponent';
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 import AddCategoryForm from '../components/AddCategoryForm';
 import SpinnerComponent from '../components/SpinnerComponent';
-import { FaEdit, FaTrash, FaEye } from "react-icons/fa"; // Import icons
-import config from "../../config"
+import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
+import Swal from 'sweetalert2';
+import config from '../../config';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../utils/axiosInstance';
+
 const AllCategory = () => {
-    const server = config.server
+    const server = config.server;
     const [showModal, setShowModal] = useState(false);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [selectedCategory, setSelectedCategory] = useState(null); // Store category to edit
+    const [selectedCategory, setSelectedCategory] = useState(null);
     const itemsPerPage = 10;
-
-    const handleCloseModal = () => {
-        setShowModal(false);
-        setSelectedCategory(null); // Reset selected category when closing modal
-    };
-    const handleShowModal = () => setShowModal(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -35,68 +32,71 @@ const AllCategory = () => {
                 setLoading(false);
             }
         };
-
-        const timeout = setTimeout(fetchCategories, 2000);
-        return () => clearTimeout(timeout);
+        fetchCategories();
     }, [showModal]);
 
-    const handleAddCategory = () => {
-        handleCloseModal();
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setSelectedCategory(null);
     };
 
+    const handleShowModal = () => setShowModal(true);
+
     const handleEditCategory = (category) => {
-        setSelectedCategory(category); // Set selected category for editing
+        setSelectedCategory(category);
         handleShowModal();
     };
 
     const handleDeleteCategory = async (categoryId) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this category?");
-        if (confirmDelete) {
-            try {
-                await axiosInstance.delete(`/delete-category/${categoryId}`);
-                setCategories(categories.filter(category => category._id !== categoryId));
-                alert("Category deleted successfully!");
-            } catch (error) {
-                alert("Error deleting category!");
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await axiosInstance.delete(`/delete-category/${categoryId}`);
+                    setCategories(categories.filter(category => category._id !== categoryId));
+                    Swal.fire('Deleted!', 'Category has been deleted.', 'success');
+                } catch (error) {
+                    Swal.fire('Error!', 'Failed to delete category.', 'error');
+                }
             }
-        }
+        });
     };
 
-    // Pagination Logic
+    const handleViewProducts = (category) => {
+        const categoryId = category._id
+        navigate(`/admin/category/${categoryId}`);
+    };
+
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentCategories = categories.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(categories.length / itemsPerPage);
-
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
-    //======================================================================
-    const navigate = useNavigate()
-    const handleViewProducts = (category) => {
-        const categoryId = category._id
-        navigate(`/admin/category/${categoryId}`);
 
-    }
     return (
         <motion.div
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0, transition: { duration: 0.8 } }}
-            style={{ minHeight: "100vh", background: "linear-gradient(135deg, #ff512f, #dd2476)", padding: "1.25rem", }}
+            style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #ff512f, #dd2476)', padding: '1.25rem' }}
         >
             <NavbarComponent />
             <Container>
                 <h2>Manage Categories</h2>
                 <Button className="btn btn-primary" onClick={handleShowModal}>Add Category</Button>
-
-                {/* Show loading spinner or error message */}
                 <div className="mt-4 text-center">
-                    {loading ? <SpinnerComponent message="Loading categories..." /> : null}
-                    {error ? <div>{error}</div> : null}
+                    {loading && <SpinnerComponent message="Loading categories..." />}
+                    {error && <div>{error}</div>}
                 </div>
-
-                {/* Display categories in a table */}
                 {!loading && !error && (
                     <>
-                        <Table bordered hover className="mb-1" style={{ width: "auto", margin: "0 auto" }}>
+                        <Table bordered hover className="mb-1" style={{ width: 'auto', margin: '0 auto' }}>
                             <thead className="table-dark">
                                 <tr>
                                     <th>Sr.No.</th>
@@ -112,36 +112,21 @@ const AllCategory = () => {
                                         <td>{indexOfFirstItem + index + 1}</td>
                                         <td>{category?.categoryName}</td>
                                         <td>
-                                            <FaEye
-                                                className="text-info"
-                                                style={{ cursor: "pointer" }}
-                                                onClick={() => handleViewProducts(category)}
-                                            />
+                                            <FaEye className="text-info" style={{ cursor: 'pointer' }} onClick={() => handleViewProducts(category)} />
                                         </td>
                                         <td>
-                                            <FaEdit
-                                                className="text-primary"
-                                                style={{ cursor: "pointer" }}
-                                                onClick={() => handleEditCategory(category)}
-                                            />
+                                            <FaEdit className="text-primary" style={{ cursor: 'pointer' }} onClick={() => handleEditCategory(category)} />
                                         </td>
                                         <td>
-                                            <FaTrash
-                                                className="text-danger"
-                                                style={{ cursor: "pointer" }}
-                                                onClick={() => handleDeleteCategory(category.CategoryId)}
-                                            />
+                                            <FaTrash className="text-danger" style={{ cursor: 'pointer' }} onClick={() => handleDeleteCategory(category._id)} />
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </Table>
-
-                        {/* Pagination Controls */}
                         <Pagination className="justify-content-center pb-2">
                             <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
                             <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} />
-
                             {[...Array(totalPages)].map((_, pageIndex) => (
                                 <Pagination.Item
                                     key={pageIndex + 1}
@@ -151,20 +136,12 @@ const AllCategory = () => {
                                     {pageIndex + 1}
                                 </Pagination.Item>
                             ))}
-
                             <Pagination.Next onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} />
                             <Pagination.Last onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} />
                         </Pagination>
                     </>
                 )}
-
-                {/* Add/Edit Category Modal */}
-                <AddCategoryForm
-                    show={showModal}
-                    handleClose={handleCloseModal}
-                    handleAddCategory={handleAddCategory}
-                    selectedCategory={selectedCategory} // Pass selected category for editing
-                />
+                <AddCategoryForm show={showModal} handleClose={handleCloseModal} selectedCategory={selectedCategory} />
             </Container>
         </motion.div>
     );

@@ -1,9 +1,10 @@
-// src/components/NavbarComponent.js
-import React from 'react';
-import { Navbar, Nav, Container } from 'react-bootstrap';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import './NavbarComponent.css';
+import React from "react";
+import { Navbar, Nav, Container } from "react-bootstrap";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2"; // Import SweetAlert
+import "./NavbarComponent.css";
+
 const NavbarComponent = () => {
     const navbarVariants = {
         hidden: { opacity: 0, y: -50 },
@@ -20,32 +21,61 @@ const NavbarComponent = () => {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
-        try {
-            const refreshToken = localStorage.getItem("refreshToken");
-            const response = await fetch("http://localhost:8000/api/v1/logout", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ token: refreshToken }),
-            });
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out of your account.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, Logout",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const refreshToken = localStorage.getItem("refreshToken");
+                    const response = await fetch("http://localhost:8000/api/v1/logout", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ token: refreshToken }),
+                    });
 
-            if (response.ok) {
-                localStorage.removeItem("access_token");
-                localStorage.removeItem("refreshToken");
-                localStorage.removeItem("userId");
-                localStorage.removeItem("roleId");
-                navigate("/"); // Redirect to home/login page
-            } else {
-                alert("Logout failed, please try again!");
+                    if (response.ok) {
+                        localStorage.removeItem("access_token");
+                        localStorage.removeItem("refreshToken");
+                        localStorage.removeItem("userId");
+                        localStorage.removeItem("roleId");
+
+                        Swal.fire({
+                            title: "Logged Out!",
+                            text: "You have been successfully logged out.",
+                            icon: "success",
+                            timer: 2000,
+                            showConfirmButton: false,
+                        });
+
+                        navigate("/"); // Redirect to home/login page
+                    } else {
+                        Swal.fire({
+                            title: "Logout Failed",
+                            text: "Something went wrong. Please try again.",
+                            icon: "error",
+                        });
+                    }
+                } catch (error) {
+                    console.error("Logout error:", error);
+                    Swal.fire({
+                        title: "Error",
+                        text: "An unexpected error occurred. Please try again.",
+                        icon: "error",
+                    });
+                }
             }
-        } catch (error) {
-            console.error("Logout error:", error);
-        }
+        });
     };
 
     return (
-
         <Navbar bg="dark" expand="lg" className="custom-navbar py-3 shadow">
             <Container>
                 <Navbar.Brand href="/admin">Admin Dashboard</Navbar.Brand>
@@ -56,7 +86,7 @@ const NavbarComponent = () => {
                         <Nav.Link href="/admin/allcategory">Categories</Nav.Link>
                         <Nav.Link href="/admin/allcustomers">Customers</Nav.Link>
                         <Nav.Link href="/admin/allcart">Orders</Nav.Link>
-                        <Nav.Link href="/admin/allenquiry">Enquires</Nav.Link>
+                        <Nav.Link href="/admin/allenquiry">Enquiries</Nav.Link>
                         <Nav.Link href="/admin/allfeedback">Feedbacks</Nav.Link>
                     </Nav>
                     <motion.button
@@ -64,7 +94,6 @@ const NavbarComponent = () => {
                         variants={buttonVariants}
                         whileHover="hover"
                         onClick={() => navigate("/admin/profile")}
-
                     >
                         Profile
                     </motion.button>
@@ -79,7 +108,6 @@ const NavbarComponent = () => {
                 </Navbar.Collapse>
             </Container>
         </Navbar>
-
     );
 };
 

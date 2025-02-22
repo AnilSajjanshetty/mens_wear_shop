@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import AddProductModal from "../components/AddProductModal";
 import axiosInstance from "../utils/axiosInstance";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 const AllProducts = () => {
     const [showModal, setShowModal] = useState(false);
@@ -31,16 +32,26 @@ const AllProducts = () => {
     };
 
     const handleDelete = async (productId) => {
-        if (window.confirm("Are you sure you want to delete this product?")) {
-            try {
-                await axiosInstance.delete(`http://localhost:8000/api/v1/delete-product/${productId}`);
-                fetchProducts();
-                alert("Product deleted successfully");
-            } catch (error) {
-                console.error("Error deleting product", error);
-                alert("Failed to delete product");
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await axiosInstance.delete(`/delete-product/${productId}`);
+                    fetchProducts();
+                    Swal.fire("Deleted!", "The product has been deleted.", "success");
+                } catch (error) {
+                    console.error("Error deleting product", error);
+                    Swal.fire("Error!", "Failed to delete the product.", "error");
+                }
             }
-        }
+        });
     };
 
     return (
