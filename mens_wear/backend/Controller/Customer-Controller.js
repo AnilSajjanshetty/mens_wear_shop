@@ -19,37 +19,47 @@ const home = async (req, res) => {
 //------   Register Customer , post request ,  /register-customer
 //--------------------------------------------------------------------------------------------
 const registerCustomer = async (req, res) => {
-  try {
-    const register = new users(req.body);
-    const createcust = await register.save();
-    // Step 2: Create a role for the registered user
-    const userRoles = new userRole({
-      UserId: createcust.UserId, // Assuming the user model uses MongoDB's ObjectId
-      RoleId: 3, // Default role as "User"
-    });
-    const createRole = await userRoles.save();
-    if (!createcust) {
-      res.status(400).send({
-        message: "Registration failed",
+  uploadSingle(req, res, async (err) => {
+    try {
+      if (err instanceof multer.MulterError) {
+        return res.status(400).json({ error: "Multer Error: " + err.message });
+      } else if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+
+      // Create user object
+      const register = new users({
+        ...req.body,
+        Image: req.file ? `UploadedFiles/${req.file.filename}` : undefined, // Save image if uploaded
       });
-    } else if (!createRole) {
-      res.status(400).send({
-        message: "role creation  failed",
+
+      const createcust = await register.save();
+
+      // Create a role for the registered user
+      const userRoles = new userRole({
+        UserId: createcust.UserId,
+        RoleId: 3, // Default role as "User"
+      });
+
+      const createRole = await userRoles.save();
+
+      if (!createcust) {
+        return res.status(400).json({ message: "Registration failed" });
+      } else if (!createRole) {
+        return res.status(400).json({ message: "Role creation failed" });
+      }
+
+      res.status(201).json({ message: "Registration successfull." });
+    } catch (error) {
+      console.error("Registration failed", error);
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
       });
     }
-
-    res.status(201).send({
-      user: createcust,
-      role: createRole,
-    });
-  } catch (error) {
-    console.error("Registration failed", error);
-    res.status(500).send({
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
+  });
 };
+
 //--------------------------------------------------------------------------------------------
 //------  get All Customer , get request ,  /get-customer
 //--------------------------------------------------------------------------------------------
