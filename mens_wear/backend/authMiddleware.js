@@ -10,10 +10,10 @@ const WHITELISTED_PATHS = [
   "/api/v1/refreshToken",
   "/api/v1/get-featured-product",
   "/api/v1/get-products-grouped",
+  "/api/v1/add-contact",
 ];
 
 const authMiddleware = async (req, res, next) => {
-  console.log(req.path);
   if (WHITELISTED_PATHS.includes(req.path)) {
     return next();
   }

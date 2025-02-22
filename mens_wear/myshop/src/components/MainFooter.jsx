@@ -34,62 +34,72 @@ const MainFooter = () => {
         setContact({ ...contact, [e.target.name]: e.target.value });
     };
 
+    // Validate feedback before submitting
+    const validateFeedback = () => {
+        if (rating < 1 || rating > 5) {
+            Swal.fire("Invalid Rating", "Please select a rating between 1 and 5.", "warning");
+            return false;
+        }
+        if (feedback.trim().length < 10 || feedback.trim().length > 500) {
+            Swal.fire("Invalid Feedback", "Feedback must be between 10 and 500 characters.", "warning");
+            return false;
+        }
+        return true;
+    };
+
+    // Validate contact form before submitting
+    const validateContact = () => {
+        const { name, email, mobileNo } = contact;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const mobileRegex = /^[0-9]{10}$/;
+
+        if (!name.trim() || !email.trim() || !mobileNo.trim() || !message.trim()) {
+            Swal.fire("Missing Fields", "Please fill in all required fields.", "warning");
+            return false;
+        }
+        if (!emailRegex.test(email)) {
+            Swal.fire("Invalid Email", "Please enter a valid email address.", "warning");
+            return false;
+        }
+        if (!mobileRegex.test(mobileNo)) {
+            Swal.fire("Invalid Mobile Number", "Please enter a valid 10-digit mobile number.", "warning");
+            return false;
+        }
+        return true;
+    };
+
     const submitFeedback = async () => {
+        if (!validateFeedback()) return;
+
         try {
             const feedbackData = { userId, rating, feedbackText: feedback };
 
             if (feedbackExists) {
                 await axiosInstance.put(`/update-feedback`, feedbackData);
-                Swal.fire({
-                    title: "Feedback Updated!",
-                    text: "Your feedback has been successfully updated.",
-                    icon: "success",
-                    timer: 2000,
-                    showConfirmButton: false,
-                });
+                Swal.fire("Feedback Updated!", "Your feedback has been successfully updated.", "success");
             } else {
                 await axiosInstance.post(`/add-feedback`, feedbackData);
                 setFeedbackExists(true);
-                Swal.fire({
-                    title: "Feedback Submitted!",
-                    text: "Thank you for your feedback!",
-                    icon: "success",
-                    timer: 2000,
-                    showConfirmButton: false,
-                });
+                Swal.fire("Feedback Submitted!", "Thank you for your feedback!", "success");
             }
             document.getElementById("feedbackModalClose").click();
         } catch (error) {
             console.error("Error submitting feedback:", error);
-            Swal.fire({
-                title: "Submission Failed",
-                text: "Something went wrong. Please try again.",
-                icon: "error",
-                confirmButtonColor: "#d33",
-            });
+            Swal.fire("Submission Failed", "Something went wrong. Please try again.", "error");
         }
     };
 
     const submitContact = async () => {
+        if (!validateContact()) return;
+
         try {
             const contactData = { ...contact, message };
             await axiosInstance.post(`/add-contact`, contactData);
-            Swal.fire({
-                title: "Message Sent!",
-                text: "We have received your message and will get back to you soon.",
-                icon: "success",
-                timer: 2000,
-                showConfirmButton: false,
-            });
+            Swal.fire("Message Sent!", "We have received your message and will get back to you soon.", "success");
             document.getElementById("contactModalClose").click();
         } catch (error) {
             console.error("Error submitting contact message:", error);
-            Swal.fire({
-                title: "Submission Failed",
-                text: "Could not send your message. Please try again later.",
-                icon: "error",
-                confirmButtonColor: "#d33",
-            });
+            Swal.fire("Submission Failed", "Could not send your message. Please try again later.", "error");
         }
     };
 
@@ -123,10 +133,10 @@ const MainFooter = () => {
                         </div>
                         <div className="modal-body">
                             <label className="form-label">Name</label>
-                            <input className="form-control mb-2" name="name" placeholder="Your Name" value={contact.name} onChange={handleContactChange} />
+                            <input className="form-control mb-2" name="name" value={contact.name} onChange={handleContactChange} />
 
                             <label className="form-label">Email</label>
-                            <input className="form-control mb-2" name="email" type="email" placeholder="Your Email" value={contact.email} onChange={handleContactChange} />
+                            <input className="form-control mb-2" name="email" type="email" value={contact.email} onChange={handleContactChange} />
 
                             <label className="form-label">Mobile Number</label>
                             <input className="form-control mb-2" name="mobileNo" placeholder="Mobile Number" value={contact.mobileNo} onChange={handleContactChange} />
@@ -135,7 +145,7 @@ const MainFooter = () => {
                             <input className="form-control mb-2" name="address" placeholder="Your Address" value={contact.address} onChange={handleContactChange} />
 
                             <label className="form-label">Message</label>
-                            <textarea className="form-control" rows="3" placeholder="Your Message" value={message} onChange={(e) => setMessage(e.target.value)}></textarea>
+                            <textarea className="form-control" rows="3" value={message} onChange={(e) => setMessage(e.target.value)}></textarea>
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-light" data-bs-dismiss="modal">Close</button>
@@ -156,24 +166,13 @@ const MainFooter = () => {
                         <div className="modal-body">
                             <label className="form-label">Rate Us</label>
                             <div className="d-flex justify-content-center mb-3">
-                                {[...Array(5)].map((_, index) => {
-                                    const ratingValue = index + 1;
-                                    return (
-                                        <FaStar
-                                            key={index}
-                                            size={30}
-                                            color={ratingValue <= (hover || rating) ? "#ffc107" : "#e4e5e9"}
-                                            onClick={() => setRating(ratingValue)}
-                                            onMouseEnter={() => setHover(ratingValue)}
-                                            onMouseLeave={() => setHover(null)}
-                                            style={{ cursor: "pointer", marginRight: "5px" }}
-                                        />
-                                    );
-                                })}
+                                {[...Array(5)].map((_, index) => (
+                                    <FaStar key={index} size={30} color={index < rating ? "#ffc107" : "#e4e5e9"} onClick={() => setRating(index + 1)} />
+                                ))}
                             </div>
 
                             <label className="form-label">Your Feedback</label>
-                            <textarea className="form-control" rows="3" placeholder="Your Feedback" value={feedback} onChange={(e) => setFeedback(e.target.value)}></textarea>
+                            <textarea className="form-control" rows="3" value={feedback} onChange={(e) => setFeedback(e.target.value)}></textarea>
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-light" data-bs-dismiss="modal">Close</button>

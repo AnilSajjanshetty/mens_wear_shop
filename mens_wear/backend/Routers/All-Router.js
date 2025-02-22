@@ -149,7 +149,7 @@ router
 router.route("/all-feedbacks").get(authorizeRoles([1]), getAllFeedback);
 
 // Contact Routes
-router.route("/add-contact").post(authorizeRoles([1, 3]), submitContactMessage);
+router.route("/add-contact").post(submitContactMessage);
 router.route("/all-contacts").get(authorizeRoles([1]), getAllContacts);
 //===================================================================
 router.route("/login").post(login);
