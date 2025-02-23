@@ -9,6 +9,7 @@ const config = {
   REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET,
   REDIS_HOST: process.env.REDIS_HOST || "localhost",
   REDIS_PORT: process.env.REDIS_PORT || 6379,
+  redisUrl: process.env.REDIS_ENDPOINT || "redis://localhost:6379",
 };
 
 // const redisClient = redis.createClient({

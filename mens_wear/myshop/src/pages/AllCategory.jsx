@@ -60,7 +60,7 @@ const AllCategory = () => {
             if (result.isConfirmed) {
                 try {
                     await axiosInstance.delete(`/delete-category/${categoryId}`);
-                    setCategories(categories.filter(category => category._id !== categoryId));
+                    setCategories(categories.filter(category => category.CategoryId !== categoryId));
                     Swal.fire('Deleted!', 'Category has been deleted.', 'success');
                 } catch (error) {
                     Swal.fire('Error!', 'Failed to delete category.', 'error');
@@ -118,7 +118,7 @@ const AllCategory = () => {
                                             <FaEdit className="text-primary" style={{ cursor: 'pointer' }} onClick={() => handleEditCategory(category)} />
                                         </td>
                                         <td>
-                                            <FaTrash className="text-danger" style={{ cursor: 'pointer' }} onClick={() => handleDeleteCategory(category._id)} />
+                                            <FaTrash className="text-danger" style={{ cursor: 'pointer' }} onClick={() => handleDeleteCategory(category.CategoryId)} />
                                         </td>
                                     </tr>
                                 ))}

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2"; // Import SweetAlert
 import "./NavbarComponent.css";
+import axiosInstance from "../utils/axiosInstance";
 
 const NavbarComponent = () => {
     const navbarVariants = {
@@ -33,15 +34,11 @@ const NavbarComponent = () => {
             if (result.isConfirmed) {
                 try {
                     const refreshToken = localStorage.getItem("refreshToken");
-                    const response = await fetch("http://localhost:8000/api/v1/logout", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ token: refreshToken }),
+                    const response = await axiosInstance.post("/logout", {
+                        token: refreshToken
                     });
 
-                    if (response.ok) {
+                    if (response.status === 200) {
                         localStorage.removeItem("access_token");
                         localStorage.removeItem("refreshToken");
                         localStorage.removeItem("userId");

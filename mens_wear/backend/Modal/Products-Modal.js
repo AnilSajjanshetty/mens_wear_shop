@@ -67,10 +67,14 @@ const productSchema = new mongoose.Schema({
     required: [true, "At least one image is required"],
     validate: {
       validator: function (images) {
-        return images.length > 0 && images.every((img) => validator.isURL(img));
+        return (
+          images.length > 0 &&
+          images.every((img) => {
+            return validator.isURL(img) || img.startsWith("UploadedFiles/");
+          })
+        );
       },
-      message:
-        "Each image must be a valid URL and at least one image is required",
+      message: "Each image must be a valid URL or a valid uploaded file path",
     },
   },
 });

@@ -3,10 +3,9 @@ import { Modal, Button, Form, Row, Col, Image } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import axiosInstance from "../utils/axiosInstance";
 import Swal from "sweetalert2";
-import config from '../../config';
 
 const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
-    const { register, handleSubmit, reset, setValue } = useForm();
+    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm();
     const [categories, setCategories] = useState([]);
     const [selectedImages, setSelectedImages] = useState([]);
 
@@ -29,7 +28,7 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
             setValue("CategoryId", product.CategoryId);
         } else {
             reset();
-            setSelectedImages([]); // Clear images when adding a new product
+            setSelectedImages([]);
         }
     }, [product, setValue, reset]);
 
@@ -64,7 +63,6 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
                 Swal.fire("Success", "Product added successfully!", "success");
             }
 
-            // **Reset form and clear images after success**
             reset();
             setSelectedImages([]);
             refreshProducts();
@@ -94,20 +92,42 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
                 <Form onSubmit={handleSubmit(onSubmit)}>
                     <Form.Group className="mb-3">
                         <Form.Label>Product Name</Form.Label>
-                        <Form.Control type="text" {...register("ProductName")} required />
+                        <Form.Control type="text" {...register("ProductName", {
+                            required: "Product name is required",
+                            minLength: { value: 3, message: "Must be at least 3 characters long" },
+                            maxLength: { value: 100, message: "Cannot exceed 100 characters" }
+                        })} />
+                        {errors.ProductName && <p className="text-danger">{errors.ProductName.message}</p>}
                     </Form.Group>
+
                     <Form.Group className="mb-3">
                         <Form.Label>Description</Form.Label>
-                        <Form.Control as="textarea" {...register("Description")} required />
+                        <Form.Control as="textarea" {...register("Description", {
+                            required: "Description is required",
+                            minLength: { value: 10, message: "Must be at least 10 characters long" },
+                            maxLength: { value: 1000, message: "Cannot exceed 1000 characters" }
+                        })} />
+                        {errors.Description && <p className="text-danger">{errors.Description.message}</p>}
                     </Form.Group>
+
                     <Form.Group className="mb-3">
                         <Form.Label>Price</Form.Label>
-                        <Form.Control type="number" {...register("Price")} required />
+                        <Form.Control type="number" {...register("Price", {
+                            required: "Price is required",
+                            min: { value: 0.01, message: "Must be at least 0.01" }
+                        })} />
+                        {errors.Price && <p className="text-danger">{errors.Price.message}</p>}
                     </Form.Group>
+
                     <Form.Group className="mb-3">
                         <Form.Label>Stock</Form.Label>
-                        <Form.Control type="text" {...register("Stock")} required />
+                        <Form.Control type="number" {...register("Stock", {
+                            required: "Stock is required",
+                            min: { value: 0, message: "Cannot be negative" }
+                        })} />
+                        {errors.Stock && <p className="text-danger">{errors.Stock.message}</p>}
                     </Form.Group>
+
                     <Form.Group className="mb-3">
                         <Form.Label>Category</Form.Label>
                         <Form.Select {...register("CategoryId")} required>
@@ -116,15 +136,12 @@ const AddProductModal = ({ show, handleClose, refreshProducts, product }) => {
                                 <option key={category._id} value={category._id}>{category.categoryName}</option>
                             ))}
                         </Form.Select>
+                        {errors.CategoryId && <p className="text-danger">{errors.CategoryId.message}</p>}
                     </Form.Group>
+
                     <Form.Group className="mb-3">
                         <Form.Label>Upload Images</Form.Label>
-                        <Form.Control
-                            type="file"
-                            name="Image"
-                            multiple
-                            onChange={handleImageSelection}
-                        />
+                        <Form.Control type="file" multiple onChange={handleImageSelection} />
                     </Form.Group>
 
                     {/* Display selected images */}
