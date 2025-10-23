@@ -19,7 +19,7 @@ const ProductCard = ({ product }) => {
       </div>
       <div className="card-body text-center flex flex-column justify-between h-full">
         <h5 className="card-title text-dark">{product.ProductName}</h5>
-        <p className="card-text text-secondary">${product.Price}</p>
+        <p className="card-text text-secondary">₹{product.Price}</p>
         <button
           className="btn btn-primary w-100 mt-auto"
           style={{

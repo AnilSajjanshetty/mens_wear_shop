@@ -4,7 +4,8 @@ const session = require("express-session");
 const AllRouters = require("./Routers/All-Router");
 const { authMiddleware } = require("./authMiddleware");
 const config = require("./Config/config");
-
+const fs = require("fs");
+const path = require("path");
 const HOST = config.HOST;
 const PORT = config.PORT;
 const app = express();
@@ -13,6 +14,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(express.json());
 
+const uploadDir = path.join(__dirname, "UploadedFiles");
+
+// ✅ Check if folder exists, if not create it
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log("📁 Created img folder");
+}
 app.use(
   session({
     secret: "secret-key",

@@ -12,6 +12,8 @@ const LoginPage = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const navigate = useNavigate(); // To handle redirection after login
   const server = config.server;
+  const admin = config.admin;
+  const user = config.user;
 
   const handleLogin = async (data) => {
     try {
@@ -35,10 +37,10 @@ const LoginPage = () => {
 
       // Redirect user based on their role
       setTimeout(() => {
-        if (roleId === 1) {
-          navigate("/admin"); // Admin Dashboard
-        } else if (roleId === 3) {
-          navigate("/user"); // User Dashboard
+        if (roleId == admin) {
+          navigate("/admin/allproducts");
+        } else if (roleId == user) {
+          navigate("/user/products");
         } else {
           console.error("Unknown role");
         }
