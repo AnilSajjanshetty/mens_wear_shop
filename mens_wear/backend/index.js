@@ -1,47 +1,26 @@
-// const express = require("express");
-// const app = express();
-// const cors = require("cors");
-
-// const AllRouters = require("./Routers/All-Router")
-
-// const port = process.env.PORT || 5000;
-
-// app.use(cors());
-
-// app.use(express.json());
-
-// // Serve static files from the "UploadedFiles" directory
-// app.use('/UploadedFiles', express.static('UploadedFiles', {
-//   // Set cache control headers to prevent caching
-//   maxAge: 0,
-//   etag: false,
-// }));
-
-// app.use("/api/v1",AllRouters)
-
-// app.listen(port, () => {
-//   console.log(`I-Shop Server Started on port no. ${port}`);
-// });
-
 const express = require("express");
-const app = express();
 const cors = require("cors");
-const client = require("prom-client");
 const session = require("express-session");
 const AllRouters = require("./Routers/All-Router");
+const { authMiddleware } = require("./authMiddleware");
+const config = require("./Config/config");
+const fs = require("fs");
+const path = require("path");
+const HOST = config.HOST;
+const PORT = config.PORT;
+const app = express();
 
-const config = require("./Config/config"); // Import configuration file
-const oauthRoutes = require("./Routers/oauth");
-// const loginRoutes = require("./Routers/login"); // read below and uncomment  call the using app.use uncomment ref 1,
-// want to use above line  comment login route in /Routers/All-Router  and change end point of  hydra log in
-const consentRoutes = require("./Routers/consent");
-const callbackRoutes = require("./Routers/callback"); // New callback route
-const refreshTokenRoutes = require("./Routers/refresh-token");
-
-const { HOST, PORT } = config; // Destructure HOST and PORT
-app.use(express.urlencoded({ extended: true })); // For URL-encoded data
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(express.json());
+
+const uploadDir = path.join(__dirname, "UploadedFiles");
+
+// ✅ Check if folder exists, if not create it
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log("📁 Created img folder");
+}
 app.use(
   session({
     secret: "secret-key",
@@ -49,23 +28,21 @@ app.use(
     saveUninitialized: true,
   })
 );
-// Serve static files from the "UploadedFiles" directory
+
+// Serve static files
 app.use(
   "/UploadedFiles",
-  express.static("UploadedFiles", {
-    maxAge: 0,
-    etag: false,
-  })
+  express.static("UploadedFiles", { maxAge: 0, etag: false })
 );
 
+// Apply auth middleware globally (whitelisted paths will be bypassed)
+app.use(authMiddleware);
+
+// All API Routes
 app.use("/api/v1", AllRouters);
-app.use("/authorize", oauthRoutes);
-// app.use("/login", loginRoutes); // ref1
-app.use("/consent", consentRoutes);
-app.use("/callback", callbackRoutes); // Register the callback route
-app.use("refresh-token", refreshTokenRoutes);
-app.listen(PORT, HOST, () => {
-  console.log(`Shraddha-Jeans Server Started on ${HOST} port no. ${PORT}`);
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server started on ${HOST} port ${PORT}`);
 });
 
 module.exports = app;

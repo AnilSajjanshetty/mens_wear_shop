@@ -1,6 +1,25 @@
 const express = require("express");
 const router = express.Router();
-const { login } = require("../Controller/Login-Controller");
+const { authorizeRoles } = require("../authMiddleware");
+const {
+  login,
+  logout,
+  refreshToken,
+} = require("../Controller/Login-Controller");
+// const { login } = require("../Routers/login");  // uncomment this if u want to use Oauth login, and coomemt above
+const { oAuth } = require("../Routers/oauth");
+const { callBack } = require("../Routers/callback");
+const { concent } = require("../Routers/concent");
+// const { refreshToken } = require("../Routers/refreshToken");
+const {
+  getFeedbackByUser,
+  submitOrUpdateFeedback,
+  getAllFeedback,
+} = require("../Controller/Feedback-Conteoller");
+const {
+  getAllContacts,
+  submitContactMessage,
+} = require("../Controller/Contact-Controller");
 const {
   home,
   registerCustomer,
@@ -15,6 +34,8 @@ const {
   editproduct,
   getSingleProduct,
   deleteProduct,
+  getAllProductsGroupedByCategory,
+  getFeaturedProduct,
 } = require("../Controller/Prodoct-Controller");
 const {
   addCart,
@@ -22,6 +43,7 @@ const {
   editCart,
   getSingleCart,
   deleteCart,
+  confirmOrder,
 } = require("../Controller/Cart-Controller");
 const {
   addVendor,
@@ -37,56 +59,105 @@ const {
   editCategory,
   getSingleCategory,
   deleteCategory,
+  getCategoryDetails,
 } = require("../Controller/Category-Controller");
 
 //-------------------------------------------------------------------------------------
 //--------- Customer Routes
 //-------------------------------------------------------------------------------------
+//=======================================================================================
 router.route("/").get(home);
 router.route("/register-customer").post(registerCustomer);
-router.route("/get-customer").get(getAllCustomer);
-router.route("/edit-customer/:customerId").put(editCustomer);
-router.route("/get-customer/:customerId").get(getSingleCustomer);
-router.route("/delete-customer/:customerId").delete(deleteCustomer);
+router.route("/get-customer").get(authorizeRoles([1]), getAllCustomer);
+router
+  .route("/edit-customer/:customerId")
+  .put(authorizeRoles([1, 3]), editCustomer);
+router
+  .route("/get-customer/:customerId")
+  .get(authorizeRoles([1, 3]), getSingleCustomer);
+router
+  .route("/delete-customer/:customerId")
+  .delete(authorizeRoles([1]), deleteCustomer);
 
 //-------------------------------------------------------------------------------------
 //--------- Products Routes
 //-------------------------------------------------------------------------------------
-router.route("/add-product").post(addProduct);
-router.route("/get-product").get(getProduct);
-router.route("/get-product/:productId").get(getSingleProduct);
-router.route("/edit-product/:productId").put(editproduct);
-router.route("/delete-product/:productId").delete(deleteProduct);
-
+router.route("/add-product").post(authorizeRoles([1]), addProduct);
+router.route("/get-product").get(authorizeRoles([1, 3]), getProduct);
+router.route("/get-featured-product").get(getFeaturedProduct);
+router
+  .route("/get-product/:productId")
+  .get(authorizeRoles([1, 3]), getSingleProduct);
+router.route("/edit-product/:productId").put(authorizeRoles([1]), editproduct);
+router
+  .route("/delete-product/:productId")
+  .delete(authorizeRoles([1]), deleteProduct);
+router.route("/get-products-grouped").get(getAllProductsGroupedByCategory);
 //-------------------------------------------------------------------------------------
 //--------- Cart Routes
 //-------------------------------------------------------------------------------------
-router.route("/add-cart").post(addCart);
-router.route("/get-cart").get(getCart);
-router.route("/get-cart/:customerId").get(getSingleCart);
-router.route("/edit-cart/:cartId").put(editCart);
-router.route("/delete-cart/:cartId").delete(deleteCart);
+router.route("/add-cart").post(authorizeRoles([1, 3]), addCart);
+router.route("/get-cart").get(authorizeRoles([1]), getCart);
+router.route("/get-cart/:userId").get(authorizeRoles([1, 3]), getSingleCart);
+router.route("/edit-cart/:cartId").put(authorizeRoles([1, 3]), editCart);
+router.route("/delete-cart/:cartId").delete(authorizeRoles([1, 3]), deleteCart);
+router.route("/confirm-cart/:cartId").put(authorizeRoles([1, 3]), confirmOrder);
 
 //-------------------------------------------------------------------------------------
 //--------- Vendor Routes
 //-------------------------------------------------------------------------------------
-router.route("/add-vendor").post(addVendor);
-router.route("/get-vendor").get(getVendor);
-router.route("/get-vendor/:vendorId").get(getSingleVendor);
-router.route("/edit-vendor/:vendorId").put(editVendor);
-router.route("/delete-vendor/:vendorId").delete(deleteVendor);
+router.route("/add-vendor").post(authorizeRoles([1]), addVendor);
+router.route("/get-vendor").get(authorizeRoles([1]), getVendor);
+router
+  .route("/get-vendor/:vendorId")
+  .get(authorizeRoles([1, 2]), getSingleVendor);
+router.route("/edit-vendor/:vendorId").put(authorizeRoles([1, 2]), editVendor);
+router
+  .route("/delete-vendor/:vendorId")
+  .delete(authorizeRoles([1]), deleteVendor);
 router
   .route("/get-vendorCategory/:categoryId")
-  .get(getSingleVendorByCategoryId);
+  .get(authorizeRoles([1]), getSingleVendorByCategoryId);
 
 //-------------------------------------------------------------------------------------
 //--------- Category Routes
 //-------------------------------------------------------------------------------------
-router.route("/add-category").post(addCategory);
-router.route("/get-category").get(getCategory);
-router.route("/get-category/:categoryId").get(getSingleCategory);
-router.route("/edit-category/:categoryId").put(editCategory);
-router.route("/delete-category/:categoryId").delete(deleteCategory);
+router.route("/add-category").post(authorizeRoles([1]), addCategory);
+router.route("/get-category").get(authorizeRoles([1, 3]), getCategory);
+router
+  .route("/get-products-by-category/:categoryId")
+  .get(authorizeRoles([1, 3]), getSingleCategory);
+router
+  .route("/edit-category/:categoryId")
+  .put(authorizeRoles([1]), editCategory);
+router
+  .route("/fetch-category/:categoryId")
+  .get(authorizeRoles([1, 3]), getCategoryDetails);
+router
+  .route("/delete-category/:categoryId")
+  .delete(authorizeRoles([1]), deleteCategory);
+//===================================================================================
+router
+  .route("/get-feedback/:userId")
+  .get(authorizeRoles([1, 3]), getFeedbackByUser);
+router
+  .route("/add-feedback")
+  .post(authorizeRoles([1, 3]), submitOrUpdateFeedback);
+router
+  .route("/update-feedback")
+  .put(authorizeRoles([1, 3]), submitOrUpdateFeedback);
+router.route("/all-feedbacks").get(authorizeRoles([1]), getAllFeedback);
 
-router.route("/login").post(login); //login route
+// Contact Routes
+router.route("/add-contact").post(submitContactMessage);
+router.route("/all-contacts").get(authorizeRoles([1]), getAllContacts);
+//===================================================================
+router.route("/login").post(login);
+router.route("/refreshToken").post(refreshToken);
+router.route("/logout").post(logout);
+router.route("/authorize").get(oAuth);
+router.route("/consent").get(concent);
+router.route("/callback").get(callBack);
+// router.route("/refreshToken").post(refreshToken);
+
 module.exports = router;

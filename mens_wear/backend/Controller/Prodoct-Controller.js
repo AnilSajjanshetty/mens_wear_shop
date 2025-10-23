@@ -1,23 +1,11 @@
 const multer = require("multer");
 require("../DataBase/DbConnection");
 const products = require("../Modal/Products-Modal");
-const upload = require("../Config/MulterConfig");
+const { upload } = require("../Config/MulterConfig");
 
 //--------------------------------------------------------------------------------------------
 //------   Add  productt , post request ,  /add-product
 //--------------------------------------------------------------------------------------------
-// const addProduct = async (req,res) =>{
-//     try {
-//         const newProduct = new products(req.body);
-//         const createproduct = await newProduct.save();
-
-//         res.send(createproduct);
-//         console.log(createproduct);
-//       } catch (error) {
-//         console.log(" failed to add new product",error)
-//         res.send(error);
-//       }
-// }
 const addProduct = async (req, res) => {
   try {
     upload(req, res, async (err) => {
@@ -27,21 +15,30 @@ const addProduct = async (req, res) => {
         return res.status(400).json({ error: err.message });
       }
 
-      // If file upload is successful
-      console.log("========================================================");
-      console.log("file name=", req.file);
+      // Ensure files are uploaded
+      if (!req.files || req.files.length === 0) {
+        return res
+          .status(400)
+          .json({ error: "At least one image is required!" });
+      }
+
+      // Explicitly add image paths to req.body
+      req.body.Image = req.files.map(
+        (file) => "UploadedFiles/" + file.filename
+      );
+      // Create product data with image paths
       const newProductData = {
         ...req.body,
-        Image: "UploadedFiles/" + req.file.filename,
       };
+
+      // Save the product to the database
       const newProduct = new products(newProductData);
       const createdProduct = await newProduct.save();
 
-      res.send(createdProduct);
-      console.log(createdProduct);
+      res.status(201).json(createdProduct);
     });
   } catch (error) {
-    console.log("Failed to add new product", error);
+    console.error("Failed to add new product:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -51,26 +48,77 @@ const addProduct = async (req, res) => {
 //--------------------------------------------------------------------------------------------
 const getProduct = async (req, res) => {
   try {
-    const allProducts = await products.find({});
+    // Fetch all products and populate CategoryId with only the categoryName field
+    const allProducts = await products
+      .find({})
+      .populate("CategoryId", "categoryName") // Populate only categoryName from Category model
+      .exec();
 
-    res.send(allProducts);
-    console.log(allProducts);
+    if (!allProducts || allProducts.length === 0) {
+      return res.status(404).json({ message: "No products found" });
+    }
+
+    // Map over allProducts to include categoryName directly in the product object
+    const productsWithCategoryName = allProducts.map((product) => ({
+      ...product.toObject(),
+      categoryName: product.CategoryId.categoryName, // Extract categoryName and add it directly
+      CategoryId: product.CategoryId._id, // Remove the CategoryId object
+    }));
+
+    res.status(200).json(productsWithCategoryName);
   } catch (error) {
-    console.log("failed to get products", error);
-    res.send(error);
+    console.error("Failed to get products", error);
+
+    // Send a response with a generic error message and status code
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: error.message || "An unexpected error occurred",
+    });
   }
 };
+//============================featured products =========================================
+const getFeaturedProduct = async (req, res) => {
+  try {
+    // Fetch the latest 3 products, sorted by creation date
+    const latestProducts = await products
+      .find({})
+      .populate("CategoryId", "categoryName") // Populate categoryName from Category model
+      .sort({ createdAt: -1 }) // Sort by newest first
+      .limit(3) // Get only 3 latest products
+      .exec();
+
+    if (!latestProducts || latestProducts.length === 0) {
+      return res.status(404).json({ message: "No products found" });
+    }
+
+    // Format response with categoryName included
+    const formattedProducts = latestProducts.map((product) => ({
+      ...product.toObject(),
+      categoryName: product.CategoryId.categoryName, // Include categoryName directly
+      CategoryId: product.CategoryId._id, // Keep only CategoryId._id
+    }));
+
+    res.status(200).json(formattedProducts);
+  } catch (error) {
+    console.error("Failed to get latest products", error);
+
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: error.message || "An unexpected error occurred",
+    });
+  }
+};
+
 //--------------------------------------------------------------------------------------------
 //------  get single products , get request ,  /get-product/:poductId
 //--------------------------------------------------------------------------------------------
 const getSingleProduct = async (req, res) => {
   try {
     const productId = req.params.productId;
-    const product = await products.findOne({ ProductId: productId });
+    const product = await products.findOne({ _id: productId });
 
     if (product) {
       res.send(product);
-      console.log(product);
     } else {
       res.status(404).send("Product not found");
     }
@@ -82,30 +130,6 @@ const getSingleProduct = async (req, res) => {
 //--------------------------------------------------------------------------------------------
 //------   Edit Product , put request ,  /Edit-product
 //--------------------------------------------------------------------------------------------
-// const editproduct = async (req,res) =>{
-//     try {
-
-//     const updateProduct=
-//         {
-//             ProductId:req.body.ProductId,
-//             ProductName: req.body.ProductName,
-//             Description: req.body.Description,
-//             Price: req.body.Price,
-//             Rating: req.body.Rating,
-//             Stock: req.body.Stock,
-//             CategoryId: req.body.CategoryId,
-//             VendorId: req.body.VendorId,
-//             Image: req.body.Image,
-//           }
-//         const updateSingleProduct = await products.updateOne({ ProductId: req.params.productId },{$set:updateProduct})
-
-//         res.send(updateSingleProduct);
-//         console.log(updateSingleProduct);
-//       } catch (error) {
-//         console.log("failed to updated product",error)
-//         res.send(error);
-//       }
-// }
 const editproduct = async (req, res) => {
   try {
     upload(req, res, async (err) => {
@@ -115,7 +139,7 @@ const editproduct = async (req, res) => {
         return res.status(400).json({ error: err.message });
       }
 
-      // If file upload is successful
+      // Prepare updated product fields
       const updateProduct = {
         ProductName: req.body.ProductName,
         Description: req.body.Description,
@@ -123,12 +147,13 @@ const editproduct = async (req, res) => {
         Rating: req.body.Rating,
         Stock: req.body.Stock,
         CategoryId: req.body.CategoryId,
-        // VendorId: req.body.VendorId,
       };
 
-      // Check if a new file is uploaded
-      if (req.file) {
-        updateProduct.Image = "UploadedFiles/" + req.file.filename;
+      // If new files are uploaded, update images
+      if (req.files && req.files.length > 0) {
+        updateProduct.Image = req.files.map(
+          (file) => "UploadedFiles/" + file.filename
+        );
       }
 
       const updateSingleProduct = await products.updateOne(
@@ -136,10 +161,18 @@ const editproduct = async (req, res) => {
         { $set: updateProduct }
       );
 
-      res.send(updateProduct);
+      if (updateSingleProduct.modifiedCount === 0) {
+        return res
+          .status(404)
+          .json({ error: "Product not found or no changes applied" });
+      }
+
+      res
+        .status(200)
+        .json({ message: "Product updated successfully", updateProduct });
     });
   } catch (error) {
-    console.log("Failed to update product", error);
+    console.error("Failed to update product", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -156,7 +189,6 @@ const deleteProduct = async (req, res) => {
 
     if (deletedProduct) {
       res.send("Product deleted successfully");
-      console.log("Deleted product:", deletedProduct);
     } else {
       res.status(404).send("Product not found");
     }
@@ -165,11 +197,51 @@ const deleteProduct = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+//==============get product by category ==============================
+const getAllProductsGroupedByCategory = async (req, res) => {
+  try {
+    const product = await products.aggregate([
+      {
+        $lookup: {
+          from: "categories", // Collection name in MongoDB
+          localField: "CategoryId",
+          foreignField: "_id",
+          as: "categoryDetails",
+        },
+      },
+      { $unwind: "$categoryDetails" }, // Flatten category array
+      {
+        $group: {
+          _id: "$CategoryId",
+          categoryName: { $first: "$categoryDetails.categoryName" },
+          products: {
+            $push: {
+              ProductId: "$_id",
+              ProductName: "$ProductName",
+              Description: "$Description",
+              Price: "$Price",
+              Rating: "$Rating",
+              Stock: "$Stock",
+              Image: "$Image",
+            },
+          },
+        },
+      },
+      { $sort: { categoryName: 1 } }, // Sort by category name
+    ]);
 
+    res.status(200).json(product);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ error: "Failed to fetch products" });
+  }
+};
 module.exports = {
   addProduct,
   getProduct,
   editproduct,
   getSingleProduct,
   deleteProduct,
+  getAllProductsGroupedByCategory,
+  getFeaturedProduct,
 };

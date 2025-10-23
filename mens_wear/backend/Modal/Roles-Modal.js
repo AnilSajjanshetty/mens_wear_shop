@@ -1,18 +1,11 @@
 const mongoose = require("mongoose");
 
-const rolesSchema = new mongoose.Schema({
-  RoleId: {
-    type: Number,
-    required: true,
-    trim: true,
-    unique: true,
-  },
-  Role: {
-    type: String,
-    required: true,
-    trim: true,
-  },
+const roleSchema = new mongoose.Schema({
+  RoleId: { type: Number, required: true },
+  RoleName: { type: String, required: true },
 });
-const roles = mongoose.model("role", rolesSchema);
 
-module.exports = roles;
+// Prevent overwriting if model already exists
+const Role = mongoose.models.role || mongoose.model("role", roleSchema);
+
+module.exports = Role;

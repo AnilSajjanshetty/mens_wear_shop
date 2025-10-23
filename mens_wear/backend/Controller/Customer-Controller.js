@@ -1,6 +1,9 @@
 require("../DataBase/DbConnection");
 const users = require("../Modal/User-Modal");
 const userRole = require("../Modal/Users-Role-Modal");
+const { uploadSingle } = require("../Config/MulterConfig");
+const multer = require("multer");
+
 //--------------------------------------------------------------------------------------------
 //------   Home , get request ,  /
 //--------------------------------------------------------------------------------------------
@@ -16,40 +19,47 @@ const home = async (req, res) => {
 //------   Register Customer , post request ,  /register-customer
 //--------------------------------------------------------------------------------------------
 const registerCustomer = async (req, res) => {
-  console.log(req.body);
-  try {
-    const register = new users(req.body);
-    const createcust = await register.save();
-    // Step 2: Create a role for the registered user
-    const userRoles = new userRole({
-      UserId: createcust.UserId, // Assuming the user model uses MongoDB's ObjectId
-      RoleId: 3, // Default role as "User"
-    });
-    const createRole = await userRoles.save();
-    if (!createcust) {
-      res.status(400).send({
-        message: "Registration failed",
+  uploadSingle(req, res, async (err) => {
+    try {
+      if (err instanceof multer.MulterError) {
+        return res.status(400).json({ error: "Multer Error: " + err.message });
+      } else if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+
+      // Create user object
+      const register = new users({
+        ...req.body,
+        Image: req.file ? `UploadedFiles/${req.file.filename}` : undefined, // Save image if uploaded
       });
-    } else if (!createRole) {
-      res.status(400).send({
-        message: "role creation  failed",
+
+      const createcust = await register.save();
+
+      // Create a role for the registered user
+      const userRoles = new userRole({
+        UserId: createcust.UserId,
+        RoleId: 3, // Default role as "User"
+      });
+
+      const createRole = await userRoles.save();
+
+      if (!createcust) {
+        return res.status(400).json({ message: "Registration failed" });
+      } else if (!createRole) {
+        return res.status(400).json({ message: "Role creation failed" });
+      }
+
+      res.status(201).json({ message: "Registration successfull." });
+    } catch (error) {
+      console.error("Registration failed", error);
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
       });
     }
-
-    res.status(201).send({
-      user: createcust,
-      role: createRole,
-    });
-
-    console.log({ createcust, createRole });
-  } catch (error) {
-    console.error("Registration failed", error);
-    res.status(500).send({
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
+  });
 };
+
 //--------------------------------------------------------------------------------------------
 //------  get All Customer , get request ,  /get-customer
 //--------------------------------------------------------------------------------------------
@@ -58,7 +68,6 @@ const getAllCustomer = async (req, res) => {
     const allCustomers = await users.find({});
 
     res.send(allCustomers);
-    console.log(allCustomers);
   } catch (error) {
     console.log("Login failed", error);
     res.send(error);
@@ -70,11 +79,10 @@ const getAllCustomer = async (req, res) => {
 const getSingleCustomer = async (req, res) => {
   try {
     const customerId = req.params.customerId;
-    const Customer = await users.findOne({ CustomerId: customerId });
+    const Customer = await users.findOne({ UserId: customerId });
 
     if (Customer) {
       res.send(Customer);
-      console.log(Customer);
     } else {
       res.status(404).send("Customer not found");
     }
@@ -87,25 +95,43 @@ const getSingleCustomer = async (req, res) => {
 //------   Edit Customer , put request ,  /Edit-customer
 //--------------------------------------------------------------------------------------------
 const editCustomer = async (req, res) => {
-  try {
-    const updateCustomer = {
-      UserName: req.body.UserName,
-      Email: req.body.Email,
-      Password: req.body.Password,
-      MobileNo: req.body.MobileNo,
-      Address: req.body.Address,
-    };
-    const updateCustomers = await users.updateOne(
-      { CustomerId: req.params.customerId },
-      { $set: updateCustomer }
-    );
+  uploadSingle(req, res, async (err) => {
+    try {
+      if (err instanceof multer.MulterError) {
+        return res.status(400).json({ error: "Multer Error: " + err.message });
+      } else if (err) {
+        return res.status(400).json({ error: err.message });
+      }
 
-    res.send(updateCustomer);
-    console.log(updateCustomer);
-  } catch (error) {
-    console.log("Update failed", error);
-    res.send(error);
-  }
+      const customerId = req.params.customerId;
+      const user = await users.findOne({ UserId: customerId });
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Update user fields
+      user.userName = req.body.userName || user.userName;
+      user.Email = req.body.Email || user.Email;
+      user.MobileNo = req.body.MobileNo || user.MobileNo;
+      user.Address = req.body.Address || user.Address;
+
+      // Update profile picture if provided
+      // Update profile picture if provided
+      console.log("Uploaded file:", req.file);
+      if (req.file) {
+        user.Image = `UploadedFiles/${req.file.filename}`;
+      } else {
+        console.log("No image file received!");
+      }
+
+      await user.save();
+      res.status(200).json(user);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ error: "Failed to update profile" });
+    }
+  });
 };
 
 //------------------------------------------------------------------------------------
@@ -120,7 +146,6 @@ const deleteCustomer = async (req, res) => {
 
     if (deletedCustomer) {
       res.send("Vendor deleted successfully");
-      console.log("Deleted customer:", deletedCustomer);
     } else {
       res.status(404).send("customer not found");
     }

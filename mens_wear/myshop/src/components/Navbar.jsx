@@ -1,30 +1,27 @@
 import React, { useState } from 'react';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
-
+import { useNavigate } from 'react-router-dom';
+import config from "../../config"
 const Navbar = () => {
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
 
-  // const openLoginModal = () => setShowLoginModal(true);
-  const closeLoginModal = () => setShowLoginModal(false);
-
-  const openRegisterModal = () => setShowRegisterModal(true);
-  const closeRegisterModal = () => setShowRegisterModal(false);
+  const navigate = useNavigate()
+  const openRegisterModal = () => navigate("/register");
   const onLoginHandle = () => {
-    window.location = config.server + "/authorize";
+    navigate("/login")
+    // window.location = config.server + "/authorize";
   };
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-dark  fixed-top"style={{
+      <nav className="navbar navbar-expand-lg navbar-dark  fixed-top" style={{
         background: 'linear-gradient(135deg, #ff7f50,#ff1493, #8a2be2, #ff1493, #ff7f50)', // Reversed gradient
-        
+
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Adding soft shadow for depth
       }}>
         <div className="container-fluid">
           <div className="navbar-brand" style={{ lineHeight: '1' }}>
-            <a className="fs-2 d-block text-white text-decoration-none text-shadow pb-1" href="#" 
-             style={{ textShadow: "5px 5px 5px rgba(0, 0, 0, 0.7)" }}>
+            <a className="fs-2 d-block text-white text-decoration-none text-shadow pb-1" href="#"
+              style={{ textShadow: "5px 5px 5px rgba(0, 0, 0, 0.7)" }}>
               श्रद्धा मेन्स वेअर
             </a>
             <span className="fs-6 text-white ps-3">
@@ -83,7 +80,7 @@ const Navbar = () => {
       </nav>
 
       {/* Modals */}
-      {showLoginModal && (
+      {/* {showLoginModal && (
         <LoginModal
           closeModal={closeLoginModal}
           openRegisterModal={openRegisterModal}
@@ -94,7 +91,7 @@ const Navbar = () => {
           closeModal={closeRegisterModal}
           openLoginModal={openLoginModal}
         />
-      )}
+      )} */}
     </>
   );
 };

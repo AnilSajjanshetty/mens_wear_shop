@@ -1,18 +1,32 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
-const userRoleSchema = new mongoose.Schema({
+const rolesSchema = new mongoose.Schema({
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: () => new mongoose.Types.ObjectId(), // Automatically generate _id
+  },
   UserId: {
     type: Number,
-    required: true,
-    unique: true, // Each user should have only one role association
+    required: [true, "User ID is required"],
+    unique: true,
+    validate: {
+      validator: (value) => validator.isInt(value.toString(), { min: 1 }),
+      message: "User ID must be a valid positive integer",
+    },
   },
   RoleId: {
     type: Number,
-    required: true,
-    default: 3, // Default role is "User"
+    required: [true, "Role ID is required"],
+    validate: {
+      validator: (value) => validator.isInt(value.toString(), { min: 1 }),
+      message: "Role ID must be a valid positive integer",
+    },
   },
 });
 
-const UserRole = mongoose.model("user_role", userRoleSchema);
+// Avoid re-compiling the model if already defined
+const userRole =
+  mongoose.models.userRole || mongoose.model("user_role", rolesSchema);
 
-module.exports = UserRole;
+module.exports = userRole;

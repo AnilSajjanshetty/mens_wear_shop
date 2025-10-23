@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
+import axiosInstance from "../utils/axiosInstance";
 import { useNavigate } from 'react-router-dom';
 
 const LoginModal = ({ closeModal, openRegisterModal }) => {
@@ -10,7 +10,7 @@ const LoginModal = ({ closeModal, openRegisterModal }) => {
 
   const handleLogin = async (data) => {
     const urlParams = new URLSearchParams(window.location.search);
-    const challenge =   "anils";
+    const challenge = "anils";
 
     if (!challenge) {
       console.error("Login challenge is missing.");
@@ -23,19 +23,12 @@ const LoginModal = ({ closeModal, openRegisterModal }) => {
       login_challenge: challenge, // Pass the challenge here
     };
 
-   
+
     try {
-      const response = await axios.post('http://192.168.43.231:3000/api/v1/login', loginData);
-      console.log('Login successful:', response.data);
+      const response = await axiosInstance.post('/login', loginData);
 
-      // Store the access token and role in localStorage
-      const { access_token, userId, roleId, roleDetails } = response.data;
-      localStorage.setItem('access_token', access_token);
-      localStorage.setItem('userId', userId);
-      localStorage.setItem('roleId', roleId);
-      localStorage.setItem('roleDetails', JSON.stringify(roleDetails));
+      const { roleId, } = response.data;
 
-      // Redirect user based on their role
       if (roleId === 1) {
         // Admin
         navigate('/admin');
