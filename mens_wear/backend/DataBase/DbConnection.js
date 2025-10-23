@@ -20,3 +20,28 @@ const intialDbConnection = async () => {
 };
 
 intialDbConnection().then(() => console.log("connected"));
+
+// require("dotenv").config();
+// const mongoose = require("mongoose");
+// const seedRoles = require("../Utils/seedRoles");
+
+// const intialDbConnection = async () => {
+//   try {
+//     // Connect to MongoDB Atlas
+//     await mongoose.connect(process.env.MONGO_URI, {
+//       useNewUrlParser: true,
+//       useUnifiedTopology: true,
+//       serverSelectionTimeoutMS: 20000, // optional, avoids timeout
+//     });
+
+//     console.log("✅ MongoDB Atlas connected successfully");
+
+//     // ✅ Seed roles immediately after successful connection
+//     await seedRoles();
+//     console.log("✅ Roles seeded successfully");
+//   } catch (error) {
+//     console.error("❌ Database connection or seeding error:", error);
+//   }
+// };
+
+// intialDbConnection();

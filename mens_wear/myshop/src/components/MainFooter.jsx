@@ -113,7 +113,7 @@ const MainFooter = () => {
     return (
         <footer className="text-center py-3 bg-dark text-white"
             style={{ background: 'linear-gradient(135deg, #ff7f50, #ff1493)', color: '#fff' }}>
-            <p>© 2025 My Shop. All rights reserved.</p>
+            <p>© 2025  श्रद्धा मेन्स वेअर. All rights reserved.</p>
             <div className="mt-3">
                 <a href="#" className="text-decoration-none text-white me-3" data-bs-toggle="modal" data-bs-target="#contactModal">
                     Contact Us
