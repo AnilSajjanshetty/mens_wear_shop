@@ -4,6 +4,7 @@ const session = require("express-session");
 const AllRouters = require("./Routers/All-Router");
 const { authMiddleware } = require("./authMiddleware");
 const config = require("./Config/config");
+const intialDbConnection = require("./DataBase/DbConnection");
 // const fs = require("fs");
 const path = require("path");
 const HOST = config.HOST;
@@ -44,5 +45,7 @@ app.use("/api/v1", AllRouters);
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server started on ${HOST} port ${PORT}`);
 });
-
+intialDbConnection().catch((err) =>
+  console.error("❌ DB Connection Failed:", err)
+);
 module.exports = app;
