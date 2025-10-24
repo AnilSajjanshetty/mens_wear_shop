@@ -92,7 +92,8 @@ const SingleProductDetail = () => {
                     {/* Left Side: Images */}
                     <div style={{ flex: "1", maxWidth: "500px" }}>
                         <img
-                            src={`http://localhost:8000/${selectedImage}`}
+                            // src={`http://localhost:8000/${selectedImage}`}
+                            src={`${selectedImage}`}
                             alt="Product"
                             style={{ width: "100%", borderRadius: "10px", boxShadow: "0 4px 8px rgba(0,0,0,0.2)" }}
                         />
@@ -100,7 +101,8 @@ const SingleProductDetail = () => {
                             {product.Image && product.Image.map((image, index) => (
                                 <img
                                     key={index}
-                                    src={`http://localhost:8000/${image}`}
+                                    // src={`http://localhost:8000/${image}`}
+                                    src={`${image}`}
                                     alt="Thumbnail"
                                     style={{ width: "60px", height: "60px", cursor: "pointer", border: selectedImage === image ? "2px solid #ff512f" : "none" }}
                                     onClick={() => setSelectedImage(image)}

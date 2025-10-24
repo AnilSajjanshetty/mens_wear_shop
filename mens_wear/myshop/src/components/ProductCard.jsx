@@ -12,7 +12,8 @@ const ProductCard = ({ product }) => {
     >
       <div className="overflow-hidden mx-auto" style={{ height: "18rem" }}>
         <img
-          src={`http://localhost:8000/${productImage}`}
+          // src={`http://localhost:8000/${productImage}`}
+          src={productImage}
           alt={product.ProductName}
           className="img-fluid"
         />

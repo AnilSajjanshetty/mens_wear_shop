@@ -77,7 +77,9 @@ const ProductsOfSingleCategory = () => {
                         {products.map((product, index) => (
                             <Col key={product._id} sm={12} md={4} lg={3} className="mb-4">
                                 <Card className="h-100 shadow-lg" style={{ borderRadius: '20px' }}>
-                                    <Card.Img variant="top" src={`http://localhost:8000/${product.Image[0]}`}
+                                    <Card.Img variant="top"
+                                        // src={`http://localhost:8000/${product.Image[0]}`}
+                                        src={`${product.Image[0]}`}
                                         alt={product.ProductName} style={{ objectFit: 'cover', borderTopLeftRadius: '20px', borderTopRightRadius: '20px', className: "img-fluid" }} />
                                     <Card.Body>
                                         <Card.Title>{product.productName}</Card.Title>
