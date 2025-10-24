@@ -70,7 +70,10 @@ const productSchema = new mongoose.Schema({
         return (
           images.length > 0 &&
           images.every((img) => {
-            return validator.isURL(img) || img.startsWith("UploadedFiles/");
+            // return validator.isURL(img) || img.startsWith("UploadedFiles/");
+            return (
+              images.length > 0 && images.every((img) => validator.isURL(img))
+            );
           })
         );
       },

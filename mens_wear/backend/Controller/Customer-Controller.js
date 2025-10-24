@@ -30,7 +30,8 @@ const registerCustomer = async (req, res) => {
       // Create user object
       const register = new users({
         ...req.body,
-        Image: req.file ? `UploadedFiles/${req.file.filename}` : undefined, // Save image if uploaded
+        // Image: req.file ? `UploadedFiles/${req.file.filename}` : undefined, // Save image if uploaded
+        Image: req.file ? req.file.path : undefined,
       });
 
       const createcust = await register.save();
@@ -117,10 +118,10 @@ const editCustomer = async (req, res) => {
       user.Address = req.body.Address || user.Address;
 
       // Update profile picture if provided
-      // Update profile picture if provided
       console.log("Uploaded file:", req.file);
       if (req.file) {
-        user.Image = `UploadedFiles/${req.file.filename}`;
+        // user.Image = `UploadedFiles/${req.file.filename}`;
+        user.Image = req.file.path;
       } else {
         console.log("No image file received!");
       }
