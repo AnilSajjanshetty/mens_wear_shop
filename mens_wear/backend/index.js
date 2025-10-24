@@ -1,38 +1,18 @@
 const express = require("express");
 const cors = require("cors");
-const session = require("express-session");
 const AllRouters = require("./Routers/All-Router");
 const { authMiddleware } = require("./authMiddleware");
 const config = require("./Config/config");
 const intialDbConnection = require("./DataBase/DbConnection");
 
-const HOST = config.HOST;
-const PORT = config.PORT;
-
 const app = express();
+const PORT = config.PORT || 8000;
 
-// ------------------ Middlewares ------------------ //
+// Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// const uploadDir = path.join(__dirname, "UploadedFiles");
-
-// // ✅ Check if folder exists, if not create it
-// if (!fs.existsSync(uploadDir)) {
-//   fs.mkdirSync(uploadDir, { recursive: true });
-//   console.log("📁 Created img folder");
-// }
-
-// ✅ Session (only if needed)
-app.use(
-  session({
-    secret: "secret-key",
-    resave: false,
-    saveUninitialized: true,
-  })
-);
-
-// ------------------ CORS Setup ------------------ //
+// CORS
 const allowedOrigins = [
   "https://shraddhajins.vercel.app",
   "http://localhost:5173",
@@ -41,33 +21,36 @@ app.use(
   cors({
     origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true, // allow cookies/sessions
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
-app.options("*", cors()); // enable preflight for all routes
 
-// // Serve static files
-// app.use(
-//   "/UploadedFiles",
-//   express.static("UploadedFiles", { maxAge: 0, etag: false })
-// );
-// ------------------ Auth Middleware ------------------ //
+// Auth middleware
 app.use(authMiddleware);
 
-// ------------------ API Routes ------------------ //
+// API routes
 app.use("/api/v1", AllRouters);
 
-// ------------------ Start Server ------------------ //
+// Serve static files if needed
+// app.use("/UploadedFiles", express.static("UploadedFiles"));
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res
+    .status(err.status || 500)
+    .json({ error: true, message: err.message || "Internal Server Error" });
+});
+
+// Start server after DB connection
 const startServer = async () => {
   try {
-    // Wait for DB connection
     await intialDbConnection();
-    console.log("✅ DB connected");
-
-    // Start listening only after DB is ready
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server running at ${HOST}:${PORT}`);
-    });
+    console.log("✅ DB Connected");
+    app.listen(PORT, "0.0.0.0", () =>
+      console.log(`Server running on port ${PORT}`)
+    );
   } catch (err) {
     console.error("❌ DB Connection Failed:", err);
   }
