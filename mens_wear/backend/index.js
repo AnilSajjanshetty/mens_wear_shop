@@ -5,15 +5,15 @@ const AllRouters = require("./Routers/All-Router");
 const { authMiddleware } = require("./authMiddleware");
 const config = require("./Config/config");
 const intialDbConnection = require("./DataBase/DbConnection");
-// const fs = require("fs");
-const path = require("path");
+
 const HOST = config.HOST;
 const PORT = config.PORT;
+
 const app = express();
 
-app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+// ------------------ Middlewares ------------------ //
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // const uploadDir = path.join(__dirname, "UploadedFiles");
 
@@ -22,6 +22,8 @@ app.use(express.json());
 //   fs.mkdirSync(uploadDir, { recursive: true });
 //   console.log("📁 Created img folder");
 // }
+
+// ✅ Session (only if needed)
 app.use(
   session({
     secret: "secret-key",
@@ -29,16 +31,19 @@ app.use(
     saveUninitialized: true,
   })
 );
-const allowedOrigins = ["https://shraddhajins.vercel.app"];
 
+// ------------------ CORS Setup ------------------ //
+const allowedOrigins = [
+  "https://shraddhajins.vercel.app",
+  "http://localhost:5173",
+];
 app.use(
   cors({
     origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true, // if using cookies or sessions
+    credentials: true, // allow cookies/sessions
   })
 );
-
 app.options("*", cors()); // enable preflight for all routes
 
 // // Serve static files
@@ -46,16 +51,22 @@ app.options("*", cors()); // enable preflight for all routes
 //   "/UploadedFiles",
 //   express.static("UploadedFiles", { maxAge: 0, etag: false })
 // );
-
-// Apply auth middleware globally (whitelisted paths will be bypassed)
+// ------------------ Auth Middleware ------------------ //
 app.use(authMiddleware);
 
-// Start server only after DB is connected
+// ------------------ API Routes ------------------ //
+app.use("/api/v1", AllRouters);
+
+// ------------------ Start Server ------------------ //
 const startServer = async () => {
   try {
-    await intialDbConnection(); // wait for MongoDB to connect
+    // Wait for DB connection
+    await intialDbConnection();
+    console.log("✅ DB connected");
+
+    // Start listening only after DB is ready
     app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server started on ${HOST} port ${PORT}`);
+      console.log(`Server running at ${HOST}:${PORT}`);
     });
   } catch (err) {
     console.error("❌ DB Connection Failed:", err);
@@ -63,4 +74,5 @@ const startServer = async () => {
 };
 
 startServer();
+
 module.exports = app;
