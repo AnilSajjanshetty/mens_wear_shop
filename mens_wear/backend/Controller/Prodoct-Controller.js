@@ -23,9 +23,10 @@ const addProduct = async (req, res) => {
       }
 
       // Explicitly add image paths to req.body
-      req.body.Image = req.files.map(
-        (file) => "UploadedFiles/" + file.filename
-      );
+      req.body.Image = req.files.map((file) => file.path);
+      // req.body.Image = req.files.map(
+      //   (file) => "UploadedFiles/" + file.filename
+      // );
       // Create product data with image paths
       const newProductData = {
         ...req.body,
@@ -151,9 +152,7 @@ const editproduct = async (req, res) => {
 
       // If new files are uploaded, update images
       if (req.files && req.files.length > 0) {
-        updateProduct.Image = req.files.map(
-          (file) => "UploadedFiles/" + file.filename
-        );
+        updateProduct.Image = req.files.map((file) => file.path); // ✅ Cloudinary URLs
       }
 
       const updateSingleProduct = await products.updateOne(
