@@ -55,7 +55,8 @@ const UserAllProducts = () => {
                                 <Card className="h-100 shadow-lg" style={{ borderRadius: "20px" }}>
                                     <Card.Img
                                         variant="top"
-                                        src={`http://localhost:8000/${product.Image[0]}`}
+                                        // src={`http://localhost:8000/${product.Image[0]}`}
+                                        src={`${product.Image[0]}`}
                                         alt={product.ProductName}
                                         style={{ objectFit: "cover", borderTopLeftRadius: "20px", borderTopRightRadius: "20px" }}
                                     />

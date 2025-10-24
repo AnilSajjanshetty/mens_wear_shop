@@ -103,7 +103,8 @@ const AllCart = () => {
                                     <div className="p-2 d-flex align-items-center justify-content-center bg-light"
                                         style={{ minWidth: "100px", minHeight: "100px", borderRadius: "8px" }}>
                                         <Image
-                                            src={`http://localhost:8000/${item.ProductDetails?.Images[0]}` || "https://via.placeholder.com/150"}
+                                            // src={`http://localhost:8000/${item.ProductDetails?.Images[0]}` || "https://via.placeholder.com/150"}
+                                            src={`${item.ProductDetails?.Images[0]}` || "https://via.placeholder.com/150"}
                                             rounded
                                             style={{ width: "80px", height: "80px", objectFit: "cover" }}
                                         />

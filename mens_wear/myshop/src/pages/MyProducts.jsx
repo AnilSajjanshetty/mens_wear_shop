@@ -60,7 +60,8 @@ const MyProducts = () => {
                                         {/* Image Section using Card.Img */}
                                         <Card.Img
                                             variant="top"
-                                            src={`http://localhost:8000/${product.Image[0]}`}
+                                            // src={`http://localhost:8000/${product.Image[0]}`}
+                                            src={`${product.Image[0]}`}
                                             alt={product.ProductName}
                                             className="img-fluid"  // Use img-fluid to ensure the image is responsive
                                             style={{

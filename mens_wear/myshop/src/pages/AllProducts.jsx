@@ -90,7 +90,8 @@ const AllProducts = () => {
                                         >
                                             {product.Image && product.Image.length > 0 ? (
                                                 <img
-                                                    src={`http://localhost:8000/${product.Image[0]}`}
+                                                    // src={`http://localhost:8000/${product.Image[0]}`}
+                                                    src={product.Image[0]} // Cloudinary URL
                                                     alt={product.ProductName}
                                                     style={{
                                                         width: "100%",

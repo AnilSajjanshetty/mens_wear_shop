@@ -111,7 +111,8 @@ const AdminProfilePage = () => {
                                 <div className="position-relative mx-auto mb-3" style={{ width: "140px", height: "140px" }}>
                                     {userProfile.Image ? (
                                         <motion.img
-                                            src={`http://localhost:8000/${userProfile.Image}`}
+                                            // src={`http://localhost:8000/${userProfile.Image}`}
+                                            src={userProfile.Image[0]}
                                             alt="Profile"
                                             className="rounded-circle border border-2 shadow"
                                             style={{ width: "100%", height: "100%", objectFit: "cover" }}
