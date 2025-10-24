@@ -1,71 +1,51 @@
 const express = require("express");
 const cors = require("cors");
+const session = require("express-session");
 const AllRouters = require("./Routers/All-Router");
 const { authMiddleware } = require("./authMiddleware");
+const config = require("./Config/config");
 const intialDbConnection = require("./DataBase/DbConnection");
-
+// const fs = require("fs");
+const path = require("path");
+const HOST = config.HOST;
+const PORT = config.PORT;
 const app = express();
 
-// CORS - Manual headers + cors package
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Access-Control-Max-Age", "86400");
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
+app.use(express.json());
 
-  // Handle OPTIONS preflight
-  if (req.method === "OPTIONS") {
-    return res.status(204).end();
-  }
+// const uploadDir = path.join(__dirname, "UploadedFiles");
 
-  next();
-});
-
+// // ✅ Check if folder exists, if not create it
+// if (!fs.existsSync(uploadDir)) {
+//   fs.mkdirSync(uploadDir, { recursive: true });
+//   console.log("📁 Created img folder");
+// }
 app.use(
-  cors({
-    origin: "*",
-    credentials: true,
-    optionsSuccessStatus: 200,
+  session({
+    secret: "secret-key",
+    resave: false,
+    saveUninitialized: true,
   })
 );
 
-// Body parsers
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// // Serve static files
+// app.use(
+//   "/UploadedFiles",
+//   express.static("UploadedFiles", { maxAge: 0, etag: false })
+// );
 
-// Auth middleware
+// Apply auth middleware globally (whitelisted paths will be bypassed)
 app.use(authMiddleware);
 
-// Routes
+// All API Routes
 app.use("/api/v1", AllRouters);
 
-// Health check
-app.get("/", (req, res) => {
-  res.json({ status: "OK", message: "API is running" });
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server started on ${HOST} port ${PORT}`);
 });
-
-// Error handler
-app.use((err, req, res, next) => {
-  console.error("Error:", err.message);
-  res.status(err.status || 500).json({
-    error: true,
-    message: err.message || "Internal Server Error",
-  });
-});
-
-// Initialize DB connection
-let dbConnected = false;
-if (!dbConnected) {
-  intialDbConnection()
-    .then(() => {
-      dbConnected = true;
-      console.log("✅ DB Connected");
-    })
-    .catch((err) => console.error("❌ DB Connection Failed:", err));
-}
-
-// Export for Vercel
+intialDbConnection().catch((err) =>
+  console.error("❌ DB Connection Failed:", err)
+);
 module.exports = app;
