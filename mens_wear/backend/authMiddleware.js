@@ -14,6 +14,9 @@ const WHITELISTED_PATHS = [
 ];
 
 const authMiddleware = async (req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return next();
+  }
   if (WHITELISTED_PATHS.includes(req.path)) {
     return next();
   }
