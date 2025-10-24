@@ -39,13 +39,17 @@ app.use(
 // Apply auth middleware globally (whitelisted paths will be bypassed)
 app.use(authMiddleware);
 
-// All API Routes
-app.use("/api/v1", AllRouters);
+// Start server only after DB is connected
+const startServer = async () => {
+  try {
+    await intialDbConnection(); // wait for MongoDB to connect
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server started on ${HOST} port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("❌ DB Connection Failed:", err);
+  }
+};
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server started on ${HOST} port ${PORT}`);
-});
-intialDbConnection().catch((err) =>
-  console.error("❌ DB Connection Failed:", err)
-);
+startServer();
 module.exports = app;
