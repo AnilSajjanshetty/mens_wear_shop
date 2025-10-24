@@ -29,6 +29,17 @@ app.use(
     saveUninitialized: true,
   })
 );
+const allowedOrigins = ["https://shraddhajins.vercel.app"];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true, // if using cookies or sessions
+  })
+);
+
+app.options("*", cors()); // enable preflight for all routes
 
 // // Serve static files
 // app.use(
